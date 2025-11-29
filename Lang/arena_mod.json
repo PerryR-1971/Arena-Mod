@@ -1,0 +1,54 @@
+{
+	"AC_Arena": {
+		
+		"Level_1_Description": 				"{~r}Arena 1{~}
+
+											Difficulty: {~green}Easy{~}
+											Cost: 2000 {~>SMALRES.def:6}
+											Reward: random minor artifact
+											Enrage timer: 5 combat rounds
+											Tactics: none
+											Description: an easy fight versus level 1 creatures.",
+																						
+		"Level_1_Short_Text": 				"Level 1 challenge
+											 Difficulty: Easy
+											 Cost: 2000 {~>SMALRES.def:6} 
+											 Reward: random artifact",
+											 
+		"Name_Town_Button": 				"Arena",
+		
+		"Name_Town_Button_Desc": 			"Arena of Life and Death.
+											Fight certain challenges for rewards.",
+											
+		"Left_Button": 						"Fight",
+		
+		"Right_Button": 					"Exit",
+		
+		"Header_Text": 						"{~r}Welcome to the Arena of Life and Death{~}
+											Remember, you are only allowed one arena combat per visit. To fight an arena battle, select the option that best describes your abilities and return to me- if you survive...",
+
+		"Exit_Condition_1": 				"You don't have enough gold to fight in this arena",
+		"Exit_Condition_2": 				"You have already fought this week. Come back later",
+		"Exit_Condition_3": 				"You don't have enough experience to fight in this arena",
+		"Exit_Condition_4": 				"You have to much experience to fight in this arena",
+		"Exit_Condition_5": 				"Daemon told me you are not allowed to visit this arena",
+		"Exit_Condition_6": 				"You have already fighted in this arena, try another challenge",
+		"Exit_Condition_7": 				"This Bossbattle Arena can only be visited when the Advanced Classes Mod is active.",
+
+		"Hint_1": 							"Arena",
+		"Hint_2": 							"The Arena Master",
+		"Hint_3": 							"The Arena (right click for more info)",
+		"Hint_4": 							"Switch pages",
+		"Hint_5": 							"Start the fight",
+		"Hint_6": 							"Exit the arena",
+
+		"diff_header": 						"Select Arena Boss Difficulty\nRight-click system options to call settings again",
+		"diff_level1": 						"Easy - 75% stats scaling.",
+		"diff_level2": 						"Normal - 100% stats scaling.",
+		"diff_level3": 						"Hard - 150% stats scaling.",
+		"diff_level4": 						"Extreme - 200% stats scaling."			
+		
+	},
+
+}
+
