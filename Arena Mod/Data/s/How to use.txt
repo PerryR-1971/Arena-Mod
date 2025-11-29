@@ -1,5 +1,0 @@
-If you want to create a new arena you need to copy the template number 001 and rename it to the next free number in the row.
-For example New_Arena_001.erm to New_Arena_006.erm. Then you need to open the copy and replace with notepad the number "_1_" to "_6_".
-Then you edit all parameters and start the game. In the city you can use the GEM town menu to access the arena. 
-Dont forget to also change the number 
-!!VRi^Arena_1_Fight^:S1; in line 122 to your template number, in case of our example to !!VRi^Arena_1_Fight^:S6;  ,otherwise you arena will not start the battle
