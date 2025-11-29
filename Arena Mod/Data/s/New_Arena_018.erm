@@ -1,0 +1,229 @@
+ZVSE2
+*Arena Fights Template* 
+by Perry R for ERA 3 
+created 2023
+
+Edit the template to create and change fights that are offered in the arena.
+
+
+
+****************************************************************************************************
+****************************************************************************************************
+Parameter Settings:
+-1 always means DISABLED
+
+******Arena Name and Description********
+{~>twcrport.def:3}
+116 Gold Golem
+
+!?FU(Set_Arena_Descriptions);
+!!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+
+!!VRs^Arena_18_CB_Name^:S^{~>cprsmall.def:118}^;
+
+!!VRs^Arena_18_Description^:S^{~r}Strange looking Gold Golem (M&M7){~}
+
+{~>monprt44.def:118} 
+
+
+Difficulty: {~red}Bossbattle{~}
+Reward: 50000{~>SMALRES.def:6} and 50000{~>ExpSmall.def:0} +1 Defense, +50 damage reduction, +15% commander health
+Description: A strange looking Golem with flat damage absorb and high defense. He acts one additional time for each new battleround, so you better kill him fast. 
+^; 
+
+
+******Battlefield********
+!!VRi^Arena_18_Battlefield_Type^:S42;     (Input (-1 til 25). Write here the Type of Battlefield you want to fight on. Current Terrain=-1. Look in ERM help under BA:B for detailed list)
+35 for Crankers Lab
+
+******Misc********
+!!VRi^Arena_18_Costs^:S5000;              (Write here the fee that it takes to enter the arena and that the player has to pay)
+!!VRi^Arena_18_Visits_Player^:S1;         (Write here how often the arena can be visited by the player, 1 is default and means only once, 5 means it can be cleared 5 times by any hero from that player)
+!!VRi^Arena_18_Visits_Hero^:S1;           (Write here how often the arena can be visited by the same hero, 1 is default and means only once, 5 means it can be cleared 5 times by the same hero)
+!!VRi^Arena_18_Level_Req^:S0;             (Write here the minimum level that the hero has to be to enter the arena, 1 means your hero must be at least level 1)
+!!VRi^Arena_18_Level_Req_Max^:S0;        (Write here the maximum level that the hero has to be to enter the arena, 0 means no level requirement)
+!!VRi^Arena_18_Stack_Experience^:S0;      (1= Enable Stack Experience, 0=Disable Stack Experience, Requirea the Stack Experience Option 900 from WoG to be enabled)
+!!VRi^Arena_18_HeroGainsNo_Exp^:S1;       (1= Hero will not gain experience in that battle, that can make sense especially for low level Arenas and to not feed to much exp to different heroes)
+
+
+******Battle********
+Different Battle parameters for the enemy can be set here
+!!VRi^Arena_18_Battle_Duration^:S0;       (0= means disabled, Write here the number of the battle rounds until the hero has to defeat the guards, otherwise the battle is lost, example 1 would mean the hero has only 1 round to defeat all enemies)
+!!VRi^Arena_18_Enrage_Timer^:S10;          (0= means disabled, Write here the battle round on which the enemies receive certain buffs. The buffs must be defined with adjusting the values. See code below)
+!!VRi^Arena_18_Magic_Immune^:S25;         (0= means disabled, 100=means 100% magic resistance. Write here if the enemies should be immune to all magic. You can also write 50 for 50% MR dwarv type)
+
+
+******Battle Boss********
+Set the stats of the boss here
+!!VRi^Arena_18_Boss_Attack^:S40;
+!!VRi^Arena_18_Boss_Defense^:S40;
+!!VRi^Arena_18_Boss_Shots^:S0;
+!!VRi^Arena_18_Boss_Damage^:S15000;
+!!VRi^Arena_18_Boss_Health^:S30000;
+!!VRi^Arena_18_Boss_Speed^:S13;
+!!VRs^Arena_18_Boss_Name^:S^Strange looking Gold Golem^;
+!!VRs^Arena_18_Boss_Description^:S^2000 flat damage absorb
++1 turn per battleround 
+No Enemy Retaliation
+Magic Resistance 25%
+Golem Resistance^;
+
+
+******Guards********
+Set the guards and the number of each slot.
+!!VRi^Arena_18_LineUp_CB_Style^:S0;       (1= Own creatures line up like in a creature bank all in the middle, 0=regular battle line up on left side)
+
+!!VRi^Arena_18_Guards_Type_Slot_0^:S116;    (Write here the Type of Creatures Guarding the CB. Check ERM help. The name of the creature in Slot 0 will be displayed when you defeat the CB.)
+!!VRi^Arena_18_Guards_Type_Slot_1^:S-1;        
+!!VRi^Arena_18_Guards_Type_Slot_2^:S-1;        
+!!VRi^Arena_18_Guards_Type_Slot_3^:S-1;      
+!!VRi^Arena_18_Guards_Type_Slot_4^:S-1;       
+!!VRi^Arena_18_Guards_Type_Slot_5^:S-1;       
+!!VRi^Arena_18_Guards_Type_Slot_6^:S-1;
+!!VRi^Arena_18_Guards_Type_Slot_7^:S-1;        
+
+!!VRi^Arena_18_Guards_Number_Slot_0^:S1; (Write here the Number of Creatures Guarding the CB for each slot. If no type for that slot is selected (-1) also put in (-1) for the number.)
+!!VRi^Arena_18_Guards_Number_Slot_1^:S0;     
+!!VRi^Arena_18_Guards_Number_Slot_2^:S0;    
+!!VRi^Arena_18_Guards_Number_Slot_3^:S0;     
+!!VRi^Arena_18_Guards_Number_Slot_4^:S0;        
+!!VRi^Arena_18_Guards_Number_Slot_5^:S0;     
+!!VRi^Arena_18_Guards_Number_Slot_6^:S0; 
+!!VRi^Arena_18_Guards_Number_Slot_7^:S0; 
+
+!!VRi^Arena_18_Guard_Number_HP_based^:S0; (0= means deactivated, if the number of enemy guards should depend on your current army health. Write the number in percent, 50 means the total enemy health will only be 50% of your armys health.)
+                                           ;(200 means all enemies numbers will have total of twice your army health points)
+Modifiers for total army health based on hero attributes. You can use this to have a difficulty scaling based on hero level and stats
+!!VRi^Arena_18_Guard_Number_Hero_LvL^:S0;  (percent points per hero level.) For example if you write 5 and the hero is level 20, it means it will add 5*20% of total guard HP to the value specified above
+!!VRi^Arena_18_Guard_Number_Hero_Att^:S0;  (percent points per hero attack.)
+!!VRi^Arena_18_Guard_Number_Hero_Def^:S0;  (percent points per hero defense.)
+!!VRi^Arena_18_Guard_Number_Hero_Spe^:S0;  (percent points per hero spell power.)
+!!VRi^Arena_18_Guard_Number_Hero_Kno^:S0;  (percent points per hero knowledge.)
+
+Scaling of Arenas
+!!VRi^Arena_18_Custom_Growth^:S0;           (Write here the number in percent% in which the CB should increase its guard EVERY week. If you write 10 the growth is exactly like neutrals grow. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_18_Custom_Growth_Linear^:S0;  (Write here the number of untis the CB should increase its guard EVERY week. If you write 25, this will be added to every stack in the CB every week. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_18_Custom_Growth_Start^:S0;     (Write here in weeks the time AFTER which the growth starts)
+
+
+******Rewards********
+You can choose several rewards. The rewards are processed one after the other.
+!!VRi^Arena_18_Reward_Wood^:S-1;             (Write here the amount of Wood 1-1000000)
+!!VRi^Arena_18_Reward_Mercury^:S-1;          (Write here the amount of Mercury 1-1000000)
+!!VRi^Arena_18_Reward_Ore^:S-1;              (Write here the amount of Ore 1-1000000)
+!!VRi^Arena_18_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
+!!VRi^Arena_18_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
+!!VRi^Arena_18_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
+!!VRi^Arena_18_Reward_Gold^:S50000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_18_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
+
+!!VRi^Arena_18_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
+!!VRi^Arena_18_Reward_Creatures_Number^:S-1;  (The amount of Creatures 0-10000)
+!!VRi^Arena_18_Reward_1_Creatures_Type^:S-1;
+!!VRi^Arena_18_Reward_1_Creatures_Number^:S-1;
+Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
+
+!!VRi^Arena_18_Reward_Experience^:S50000;       (The amount of Experience 1-9999999)
+
+!!VRi^Arena_18_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
+!!VRi^Arena_18_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
+!!VRi^Arena_18_Reward_2_Artifacts_Class^:S-2;
+!!VRi^Arena_18_Reward_2_Artifacts_Specific^:S-1; 
+!!VRi^Arena_18_Reward_3_Artifacts_Class^:S-2;
+!!VRi^Arena_18_Reward_3_Artifacts_Specific^:S-1; 
+!!VRi^Arena_18_Reward_4_Artifacts_Class^:S-2;
+!!VRi^Arena_18_Reward_4_Artifacts_Specific^:S-1; 
+Random Artifacts can also be generated in a certain range x1-x2. If you want to use this option go to the reward section Line ~409 and enable the code. Certain artifacts like blank WoG artifacts or combination artifacts are banned by default and must be enabled by the modder. 
+At the end of the mod search for Check_Forbidden_Artifacts and remove the code to enable the artifacts or add new IDs.
+
+!!VRi^Arena_18_Reward_PrimSkill^:S1;        (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random, 5-all)
+!!VRi^Arena_18_Reward_PrimSkill_Amount^:S1; (1-99)
+
+!!VRi^Arena_18_Reward_Spell_Points^:S-1;     (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random)
+!!VRi^Arena_18_Reward_Spell^:S-1;            (-1=disabled, 0-69 Spell ID, 70=Random, 71=Random LvL1, 72=Random LvL2, 73=Random LvL3, 74=Random LvL4, 75=Random LvL5)
+
+!!VRi^Arena_18_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
+!!VRi^Arena_18_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_18_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
+
+;(To exclude certain artifacts to appear as reward go to func: (Arena_18_Check_Forbidden_Artifacts))
+
+!!VRi^Arena_18_Custom_Sound^:S0;          (1=yes, 0=no, if activated you need to find the correct sound file of the object you want to replace, use the SN trigger for it. That is necessary so that it can be replaced and your custom file can be played.)
+!!VRs^Arena_18_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_18_Custom_Sound is set active)
+
+
+!?FU(OnSetupBattlefield)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!if&y1=18;
+  !!BM21:P99;                           [set new position]
+!!en;
+
+
+*100% chance to act twice in combat with Positive Spirit Enchantment
+!?FU(OnCombatRound)&i^battle_round^>=0/i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>18:E; [Exit if it is not Arena Fight]
+!!SN:W^Arena_Boss_acting stack^/-1;     [reset act twice counter and battle stack each new battle round]
+!!if&i^battle_round^>=0;
+  !!re i/0/41;                          [loop all stacks and reset]
+    !!SN:W^Arena_Boss_abilityCounter_%i^/v997;
+  !!en;
+!!en;
+
+!?FU(OnBeforeBattleAction)&i^battle_round^>=0/i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>18:E; [Exit if it is not Arena Fight]
+
+!!SN:W^Arena_Boss_acting stack^/-1;
+!!BG:A?y1 N?y2 E?y6;                    [Get action type and stack number and attacked stack]
+!!FU&y1<>2/
+     y1<>6/
+     y1<>7/
+     y1<>9/
+     y1<>10/
+     y1<>11:E;                          exit for wrong condition
+
+!!BMy2:T?y3 I?y4 N?y5;                  [get type and side]
+!!if&y2=21;                             [If raid boss]
+  !!VRy20:S0R1;                         [make a coin flip]
+  !!VRy20:S1;                         [make a coin flip]
+  !!if&y6>=0;                           [if a valid target stack]
+    !!BMy6:N?y13 F?y14 F?y15;           [get number of attacked monsters]
+    !!VRy14:&4194304;                   [Check for Summoning flag]
+    !!VRy15:&12582912;                  [Check for Clone flag]
+    !!VRy20|y13=1/y14>0/y15>0:S1;       [Set higher chance to act again if just one unit, or summoned or cloned]
+  !!en;
+  !!SN&y20=1:W^Arena_Boss_acting stack^/y2; [set and save stack that should act twice]
+!!en;
+
+
+!?FU(OnBattleActionEnd)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>18:E; [Exit if it is not Arena Fight]
+
+!!SN:W^Arena_Boss_acting stack^/?y1;
+!!if&y1>=0/y1<=41;                      [if a valid battle stack]
+  !!SN:W^Arena_Boss_abilityCounter_%Y1^/?y2; [check ability counter]
+  !!BMy1&y2>=1:Fd~(MON_FLAG_ACTED);      [set act twice flag for stack]
+  !!SN:W^Arena_Boss_abilityCounter_%Y1^/d-1; [reduce ability counter]
+  !!VRz1&y2>=1/y1=21:S^{~r}Arena Boss acts again{~}^;
+  !!BU&y2>=1/y1=21:Mz1;
+!!en;
+
+!?FU(OnBeforeBattleStackTurn)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>18:E; [Exit if it is not Arena Fight]
+!!SN:W^Arena_Boss_acting stack^/?y1; 
+!!FU&y1=-1:E;                           [exit if no valid stack]
+!!BMy1:T?y2 N?y3;                       [get type and number]
+!!FU|y2=-1/y3<=0;                       [exit if not valid]
+!!SN:W^Arena_Boss_acting stack^/x1;     [set stack that should act twice]
+
+
+!?FU(OnStackToStackDamage)&i^Arena_Fight^; 
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>18:E; [Exit if it is not Arena Fight]
+!!if&x1>=0/x1<=41;                      [if any valid battlestack]
+!!if&x2>=0/x2<=41;                      [if any valid battlestack]  
+  !!if&x2=21;                           [If Arena Boss]
+  !!if|x7=0/x7=1;                       [If melee or range attack]
+    !!VRx4:-2000;                       [add new damage]
+    !!VRx4&x4<0:S0;                     [value cannot be negative]
+  !!en;
+  !!en;
+!!en;
+!!en;
