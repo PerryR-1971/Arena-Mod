@@ -1,0 +1,241 @@
+ZVSE2
+*Arena Fights Template* 
+by Perry R for ERA 3 
+created 2023
+
+Edit the template to create and change fights that are offered in the arena.
+
+
+
+****************************************************************************************************
+****************************************************************************************************
+Parameter Settings:
+-1 always means DISABLED
+
+******Arena Name and Description********
+{~>twcrport.def:3}
+
+
+!?FU(Set_Arena_Descriptions);
+!!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+
+!!VRs^Arena_29_CB_Name^:S^{~>cprsmall.def:57}^;
+
+!!VRs^Arena_29_Description^:S^{~r}Xenofex (M&M7){~}
+
+{~>monprt44.def:57} 
+
+
+Difficulty: {~red}Bossbattle{~}
+Reward: 100000{~>SMALRES.def:6} and 1000000{~>ExpSmall.def:0} +1 to all primary stats, +20% Fire Spell damage, +10 Magic Strength for Fire Spells.
+
+Description: Defeat Xenofex but beware of his battle tricks. 
+Tipp:Use Anti Magic spell.^;
+
+
+******Battlefield********
+!!VRi^Arena_29_Battlefield_Type^:S16;     (Input (-1 til 25). Write here the Type of Battlefield you want to fight on. Current Terrain=-1. Look in ERM help under BA:B for detailed list)
+
+
+******Misc********
+!!VRi^Arena_29_Costs^:S5000;              (Write here the fee that it takes to enter the arena and that the player has to pay)
+!!VRi^Arena_29_Visits_Player^:S1;         (Write here how often the arena can be visited by the player, 1 is default and means only once, 5 means it can be cleared 5 times by any hero from that player)
+!!VRi^Arena_29_Visits_Hero^:S1;           (Write here how often the arena can be visited by the same hero, 1 is default and means only once, 5 means it can be cleared 5 times by the same hero)
+!!VRi^Arena_29_Level_Req^:S0;             (Write here the minimum level that the hero has to be to enter the arena, 1 means your hero must be at least level 1)
+!!VRi^Arena_29_Level_Req_Max^:S0;        (Write here the maximum level that the hero has to be to enter the arena, 0 means no level requirement)
+!!VRi^Arena_29_Stack_Experience^:S0;      (1= Enable Stack Experience, 0=Disable Stack Experience, Requirea the Stack Experience Option 900 from WoG to be enabled)
+!!VRi^Arena_29_HeroGainsNo_Exp^:S1;       (1= Hero will not gain experience in that battle, that can make sense especially for low level Arenas and to not feed to much exp to different heroes)
+
+
+******Battle********
+Different Battle parameters for the enemy can be set here
+!!VRi^Arena_29_Battle_Duration^:S0;       (0= means disabled, Write here the number of the battle rounds until the hero has to defeat the guards, otherwise the battle is lost, example 1 would mean the hero has only 1 round to defeat all enemies)
+!!VRi^Arena_29_Enrage_Timer^:S0;          (0= means disabled, Write here the battle round on which the enemies receive certain buffs. The buffs must be defined with adjusting the values. See code below)
+!!VRi^Arena_29_Magic_Immune^:S25;        (0= means disabled, 100=means 100% magic resistance. Write here if the enemies should be immune to all magic. You can also write 50 for 50% MR dwarv type)
+
+******Battle Boss********
+Set the stats of the boss here
+!!VRi^Arena_29_Boss_Attack^:S80;
+!!VRi^Arena_29_Boss_Defense^:S80;
+!!VRi^Arena_29_Boss_Shots^:S0;
+!!VRi^Arena_29_Boss_Damage^:S20000;
+!!VRi^Arena_29_Boss_Health^:S100000;
+!!VRi^Arena_29_Boss_Speed^:S15;
+!!VRs^Arena_29_Boss_Name^:S^Xenofex^;
+!!VRs^Arena_29_Boss_Description^:S^Casts random Fireballs
+Applies various debuffs
+Acts twice
+Magic Resistance 25%^;
+
+******Guards********
+Set the guards and the number of each slot.
+!!VRi^Arena_29_LineUp_CB_Style^:S0;       (1= Own creatures line up like in a creature bank all in the middle, 0=regular battle line up on left side)
+
+!!VRi^Arena_29_Guards_Type_Slot_0^:S55;    (Write here the Type of Creatures Guarding the CB. Check ERM help. The name of the creature in Slot 0 will be displayed when you defeat the CB.)
+!!VRi^Arena_29_Guards_Type_Slot_1^:S-1;        
+!!VRi^Arena_29_Guards_Type_Slot_2^:S-1;        
+!!VRi^Arena_29_Guards_Type_Slot_3^:S-1;      
+!!VRi^Arena_29_Guards_Type_Slot_4^:S-1;       
+!!VRi^Arena_29_Guards_Type_Slot_5^:S-1;       
+!!VRi^Arena_29_Guards_Type_Slot_6^:S-1;
+!!VRi^Arena_29_Guards_Type_Slot_7^:S-1;        
+
+!!VRi^Arena_29_Guards_Number_Slot_0^:S1; (Write here the Number of Creatures Guarding the CB for each slot. If no type for that slot is selected (-1) also put in (-1) for the number.)
+!!VRi^Arena_29_Guards_Number_Slot_1^:S0;     
+!!VRi^Arena_29_Guards_Number_Slot_2^:S0;    
+!!VRi^Arena_29_Guards_Number_Slot_3^:S0;     
+!!VRi^Arena_29_Guards_Number_Slot_4^:S0;        
+!!VRi^Arena_29_Guards_Number_Slot_5^:S0;     
+!!VRi^Arena_29_Guards_Number_Slot_6^:S0; 
+!!VRi^Arena_29_Guards_Number_Slot_7^:S0; 
+
+!!VRi^Arena_29_Guard_Number_HP_based^:S0; (0= means deactivated, if the number of enemy guards should depend on your current army health. Write the number in percent, 50 means the total enemy health will only be 50% of your armys health.)
+                                           ;(200 means all enemies numbers will have total of twice your army health points)
+Modifiers for total army health based on hero attributes. You can use this to have a difficulty scaling based on hero level and stats
+!!VRi^Arena_29_Guard_Number_Hero_LvL^:S0;  (percent points per hero level.) For example if you write 5 and the hero is level 20, it means it will add 5*20% of total guard HP to the value specified above
+!!VRi^Arena_29_Guard_Number_Hero_Att^:S0;  (percent points per hero attack.)
+!!VRi^Arena_29_Guard_Number_Hero_Def^:S0;  (percent points per hero defense.)
+!!VRi^Arena_29_Guard_Number_Hero_Spe^:S0;  (percent points per hero spell power.)
+!!VRi^Arena_29_Guard_Number_Hero_Kno^:S0;  (percent points per hero knowledge.)
+
+Scaling of Arenas
+!!VRi^Arena_29_Custom_Growth^:S0;           (Write here the number in percent% in which the CB should increase its guard EVERY week. If you write 10 the growth is exactly like neutrals grow. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_29_Custom_Growth_Linear^:S0;  (Write here the number of untis the CB should increase its guard EVERY week. If you write 25, this will be added to every stack in the CB every week. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_29_Custom_Growth_Start^:S0;     (Write here in weeks the time AFTER which the growth starts)
+
+
+******Rewards********
+You can choose several rewards. The rewards are processed one after the other.
+!!VRi^Arena_29_Reward_Wood^:S-1;             (Write here the amount of Wood 1-1000000)
+!!VRi^Arena_29_Reward_Mercury^:S-1;          (Write here the amount of Mercury 1-1000000)
+!!VRi^Arena_29_Reward_Ore^:S-1;              (Write here the amount of Ore 1-1000000)
+!!VRi^Arena_29_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
+!!VRi^Arena_29_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
+!!VRi^Arena_29_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
+!!VRi^Arena_29_Reward_Gold^:S100000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_29_Reward_Mithril^:S5;          (Write here the amount of Mithril 1-1000000)
+
+!!VRi^Arena_29_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
+!!VRi^Arena_29_Reward_Creatures_Number^:S-1;  (The amount of Creatures 0-10000)
+!!VRi^Arena_29_Reward_1_Creatures_Type^:S-1;
+!!VRi^Arena_29_Reward_1_Creatures_Number^:S-1;
+Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
+
+!!VRi^Arena_29_Reward_Experience^:S1000000;       (The amount of Experience 1-9999999)
+
+!!VRi^Arena_29_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
+!!VRi^Arena_29_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
+!!VRi^Arena_29_Reward_2_Artifacts_Class^:S-2;
+!!VRi^Arena_29_Reward_2_Artifacts_Specific^:S-1; 
+!!VRi^Arena_29_Reward_3_Artifacts_Class^:S-2;
+!!VRi^Arena_29_Reward_3_Artifacts_Specific^:S-1; 
+!!VRi^Arena_29_Reward_4_Artifacts_Class^:S-2;
+!!VRi^Arena_29_Reward_4_Artifacts_Specific^:S-1; 
+Random Artifacts can also be generated in a certain range x1-x2. If you want to use this option go to the reward section Line ~409 and enable the code. Certain artifacts like blank WoG artifacts or combination artifacts are banned by default and must be enabled by the modder. 
+At the end of the mod search for Check_Forbidden_Artifacts and remove the code to enable the artifacts or add new IDs.
+
+!!VRi^Arena_29_Reward_PrimSkill^:S5;        (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random, 5-all)
+!!VRi^Arena_29_Reward_PrimSkill_Amount^:S1; (1-99)
+
+!!VRi^Arena_29_Reward_Spell_Points^:S-1;     (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random)
+!!VRi^Arena_29_Reward_Spell^:S-1;            (-1=disabled, 0-69 Spell ID, 70=Random, 71=Random LvL1, 72=Random LvL2, 73=Random LvL3, 74=Random LvL4, 75=Random LvL5)
+
+!!VRi^Arena_29_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
+!!VRi^Arena_29_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_29_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
+
+;(To exclude certain artifacts to appear as reward go to func: (Arena_29_Check_Forbidden_Artifacts))
+
+!!VRi^Arena_29_Custom_Sound^:S0;          (1=yes, 0=no, if activated you need to find the correct sound file of the object you want to replace, use the SN trigger for it. That is necessary so that it can be replaced and your custom file can be played.)
+!!VRs^Arena_29_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_29_Custom_Sound is set active)
+
+
+!!VRi^Arena_29_Cast_Spell_ID^:S21;      [Set to Fire Ball cast]
+!!VRi^Arena_29_Cast_Spells^:S1;         [Set amount of cast]
+!!SN:W^Arena_29_Cast_Spell_Damage^/7500; [Set the damage the spell should cause]
+
+!!VRi^Arena_29_Act_Twice^:S1;           [acts twice]
+!!VRi^Arena_29_Regeneration_Value^:S0; [Regeneration in percent of HP per turn]
+!!SN:W^Arena_29_Summon_Creature_ID^/0; set the creature ID that should be summoned
+!!SN:W^Arena_29_Summon_Creature_Numbers^/0; set the amount of creatures that will be summoned
+
+
+!?FU(OnSetupBattlefield)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!if&y1=29;    
+  !!BM21:P95;                           [set new position]
+  !!SN:W^Arena_29_Once_Flag^/0;         [reset flag]
+!!en;
+
+
+!?BF&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>29:E;
+*!BF:M131071/65537/65537/65537/65537/65537/65537/65537/65537/65537/131071;
+!!BF:O50/73 O54/159 O54/113;                [place rocks around the creature]
+
+
+!?FU(OnBattleRound)&v997=0;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!if&y1=29;
+  !!SS31:E3/?y20;                       [Increase Expert Fire Resistance Spell temporarly]
+  !!SS31:E3/0;                          [Increase Fire Resistance Spell temporarly]
+  !!BM21:M31/99/3;                      [Apply Fire Resistance to that Creature]
+  !!SS31:E3/y20;                        [Increase Fire Resistance Spell temporarly]
+!!en;
+
+get regeneration at third battle round
+!?FU(OnBattleRound)&v997=3;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!if&y1=29;
+  !!VRi^Arena_29_Regeneration_Value^:S10; [Regeneration in percent of HP per turn]
+  !!SN:W^Arena_29_Summon_Creature_ID^/54; set the creature ID that should be summoned
+  !!SN:W^Arena_29_Summon_Creature_Numbers^/500; set the amount of creatures that will be summoned
+!!en;
+
+Remove the summoning at the fourth battle round
+!?FU(OnBattleRound)&v997=4;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!if&y1=29;  
+  !!SN:W^Arena_29_Summon_Creature_ID^/0; set the creature ID that should be summoned
+  !!SN:W^Arena_29_Summon_Creature_Numbers^/0; set the amount of creatures that will be summoned
+!!en;
+54  Devil 
+
+!?FU(ACM_OnAfterAttack)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>29:E; [Exit if it is not Arena Fight]
+!!if&x1=21;                             [If Raid Boss]
+  !!VRy3:S25;                           [Set to 25% chance]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M70/3/3; [Stone]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M71/3/3; [Poison]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M72/3/3; [Bind]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M73/3/3; [Disease]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M74/3/3; [Paralyze]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M75/3/3; [Age]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M59/3/3; [Berserk]
+  !!VRy1:S0R100; !!BMx2&y1<=y3:M60/3/2; [Hypnotize]
+!!en;
+
+
+!?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^;
+!#VA(stackSide:x) (stackInd:x);
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>29:E; [Exit if it is not Arena Fight]
+!!if&x1=1/x2=0;                         [if defender side]
+  !!SN:W^Arena_29_Once_Flag^/?y50;
+  !!SS26&v997=0/y50=0:E3/?y30 P?y31;    [temp save effect and power]
+  !!SS26&v997=0/y50=0:E3/5000 P0;       [temp set spell damage]
+  !!BM21&v997=0/y50=0:C26/0/3/3/0;      [cast Armagedon in the First Battle Round]
+  !!SS26&v997=0/y50=0:E3/y30 Py31;      [temp save effect and power]
+  !!SN:W^Arena_29_Once_Flag^/1;
+  !!SS21:E3/?y30 P?y31;                 [temp save effect and power]
+  !!SS21:E3/6000 P0;                    [temp set spell damage]
+    !!VRy10:S0R186;                     [Generate Random Battlefield Position]
+    !!BM21:C21/y10/3/3/0;               [cast Fireball in the First Battle Round]
+    !!VRy10:S0R186;                     [Generate Random Battlefield Position]
+    !!BM21:C21/y10/3/3/0;               [cast Fireball  in the First Battle Round]
+    !!VRy10:S0R186;                     [Generate Random Battlefield Position]
+    !!BM21:C21/y10/3/3/0;               [cast Fireball  in the First Battle Round]
+    !!VRy10:S0R186;                     [Generate Random Battlefield Position]
+    !!BM21:C21/y10/3/3/0;               [cast Fireball  in the First Battle Round]
+    !!VRy10:S0R186;                     [Generate Random Battlefield Position]
+    !!BM21:C21/y10/3/3/0;               [cast Fireball  in the First Battle Round]
+  !!SS21:E3/y30 Py31;                   [temp save effect and power]
+!!en;

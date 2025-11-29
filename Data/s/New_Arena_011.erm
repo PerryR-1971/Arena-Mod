@@ -1,0 +1,138 @@
+ZVSE2
+*Arena Fights Template* 
+by Perry R for ERA 3 
+created 2023
+
+Edit the template to create and change fights that are offered in the arena.
+
+{~>artifact.def:%Y90}
+
+****************************************************************************************************
+****************************************************************************************************
+Parameter Settings:
+-1 always means DISABLED
+
+******Arena Name and Description********
+!?FU(Set_Arena_Descriptions);
+!!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!VRy90:Si^Arena_11_Reward_1_Artifacts_Random^;
+
+
+!!VRs^Arena_11_CB_Name^:S^Arena 11^;
+!!VRs^Arena_11_Description^:S^{~r}Arena 11 {~>cprsmall.def:20} {~>cprsmall.def:24} {~>cprsmall.def:21} {~>cprsmall.def:25}{~}
+
+Difficulty: {~r}Hard{~}
+Cost: 5000{~>SMALRES.def:6}
+Reward: 100000{~>SMALRES.def:6}, Resources, including Mithril and one artifact
+
+Description: Fight vs %Y10 Elves and Dendroids
+
+Specials: {~r}Enrage Timer{~}
+enemy creatures will get stronger after battleround 3!^; (Set the text that shows when you visit the CB)
+
+
+!?PI;
+******Battlefield********
+!!VRi^Arena_11_Battlefield_Type^:S143;     (Input (-1 til 25). Write here the Type of Battlefield you want to fight on. Current Terrain=-1. Look in ERM help under BA:B for detailed list)
+
+
+******Misc********
+!!VRi^Arena_11_Costs^:S5000;              (Write here the fee that it takes to enter the arena and that the player has to pay)
+!!VRi^Arena_11_Visits_Player^:S1;         (Write here how often the arena can be visited by the player, 1 is default and means only once, 5 means it can be cleared 5 times by any hero from that player)
+!!VRi^Arena_11_Visits_Hero^:S1;           (Write here how often the arena can be visited by the same hero, 1 is default and means only once, 5 means it can be cleared 5 times by the same hero)
+!!VRi^Arena_11_Level_Req^:S30;             (Write here the minimum level that the hero has to be to enter the arena, 1 means your hero must be at least level 1)
+!!VRi^Arena_11_Level_Req_Max^:S50;        (Write here the maximum level that the hero has to be to enter the arena, 0 means no level requirement)
+!!VRi^Arena_11_Stack_Experience^:S0;      (1= Enable Stack Experience, 0=Disable Stack Experience, Requirea the Stack Experience Option 900 from WoG to be enabled)
+!!VRi^Arena_11_HeroGainsNo_Exp^:S1;       (1= Hero will not gain experience in that battle, that can make sense especially for low level Arenas and to not feed to much exp to different heroes)
+
+
+******Battle********
+Different Battle parameters for the enemy can be set here
+!!VRi^Arena_11_Battle_Duration^:S0;       (0= means disabled, Write here the number of the battle rounds until the hero has to defeat the guards, otherwise the battle is lost, example 1 would mean the hero has only 1 round to defeat all enemies)
+!!VRi^Arena_11_Enrage_Timer^:S3;          (0= means disabled, Write here the battle round on which the enemies receive certain buffs. The buffs must be defined with adjusting the values. See code below)
+!!VRi^Arena_11_Magic_Immune^:S0;        (0= means disabled, 100=means 100% magic resistance. Write here if the enemies should be immune to all magic. You can also write 50 for 50% MR dwarv type)
+
+
+******Guards********
+Set the guards and the number of each slot.
+!!VRi^Arena_11_LineUp_CB_Style^:S1;       (1= Own creatures line up like in a creature bank all in the middle, 0=regular battle line up on left side)
+
+!!VRi^Arena_11_Guards_Type_Slot_0^:S18;    (Write here the Type of Creatures Guarding the CB. Check ERM help. The name of the creature in Slot 0 will be displayed when you defeat the CB.)
+!!VRi^Arena_11_Guards_Type_Slot_1^:S22;        
+!!VRi^Arena_11_Guards_Type_Slot_2^:S19;        
+!!VRi^Arena_11_Guards_Type_Slot_3^:S23;      
+!!VRi^Arena_11_Guards_Type_Slot_4^:S-1;       
+!!VRi^Arena_11_Guards_Type_Slot_5^:S-1;       
+!!VRi^Arena_11_Guards_Type_Slot_6^:S-1;
+!!VRi^Arena_11_Guards_Type_Slot_7^:S-1;        
+
+!!VRi^Arena_11_Guards_Number_Slot_0^:S5000; (Write here the Number of Creatures Guarding the CB for each slot. If no type for that slot is selected (-1) also put in (-1) for the number.)
+!!VRi^Arena_11_Guards_Number_Slot_1^:S5000;     
+!!VRi^Arena_11_Guards_Number_Slot_2^:S5000;    
+!!VRi^Arena_11_Guards_Number_Slot_3^:S5000;     
+!!VRi^Arena_11_Guards_Number_Slot_4^:S-1;        
+!!VRi^Arena_11_Guards_Number_Slot_5^:S-1;     
+!!VRi^Arena_11_Guards_Number_Slot_6^:S-1; 
+!!VRi^Arena_11_Guards_Number_Slot_7^:S-1;
+
+!!VRi^Arena_11_Custom_Growth^:S0;           (Write here the number in percent% in which the CB should increase its guard EVERY week. If you write 10 the growth is exactly like neutrals grow. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_11_Custom_Growth_Linear^:S250;  (Write here the number of untis the CB should increase its guard EVERY week. If you write 25, this will be added to every stack in the CB every week. Linear and Exponential growth can be active at the same time)
+!!VRi^Arena_11_Custom_Growth_Start^:S34;     (Write here in weeks the time AFTER which the growth starts) 
+
+!!VRi^Arena_11_Guard_Number_HP_based^:S0; (0= means deactivated, if the number of enemy guards should depend on your current army health. Write the number in percent, 50 means the total enemy health will only be 50% of your armys health.)
+                                           ;(200 means all enemies numbers will have total of twice your army health points)
+Modifiers for total army health based on hero attributes. You can use this to have a difficulty scaling based on hero level and stats
+!!VRi^Arena_11_Guard_Number_Hero_LvL^:S0;  (percent points per hero level.) For example if you write 5 and the hero is level 20, it means it will add 5*20% of total guard HP to the value specified above
+!!VRi^Arena_11_Guard_Number_Hero_Att^:S0;  (percent points per hero attack.)
+!!VRi^Arena_11_Guard_Number_Hero_Def^:S0;  (percent points per hero defense.)
+!!VRi^Arena_11_Guard_Number_Hero_Spe^:S0;  (percent points per hero spell power.)
+!!VRi^Arena_11_Guard_Number_Hero_Kno^:S0;  (percent points per hero knowledge.)
+
+******Rewards********
+You can choose several rewards. The rewards are processed one after the other.
+!!VRi^Arena_11_Reward_Wood^:S20;             (Write here the amount of Wood 1-1000000)
+!!VRi^Arena_11_Reward_Mercury^:S10;          (Write here the amount of Mercury 1-1000000)
+!!VRi^Arena_11_Reward_Ore^:S20;              (Write here the amount of Ore 1-1000000)
+!!VRi^Arena_11_Reward_Sulfur^:S10;           (Write here the amount of Sulfur 1-1000000)
+!!VRi^Arena_11_Reward_Crystal^:S10;          (Write here the amount of Crystal 1-1000000)
+!!VRi^Arena_11_Reward_Gems^:S10;             (Write here the amount of Gems 1-1000000)
+!!VRi^Arena_11_Reward_Gold^:S100000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_11_Reward_Mithril^:S5;          (Write here the amount of Mithril 1-1000000)
+
+!!VRi^Arena_11_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
+!!VRi^Arena_11_Reward_Creatures_Number^:S0;  (The amount of Creatures 0-10000)
+!!VRi^Arena_11_Reward_1_Creatures_Type^:S-1;
+!!VRi^Arena_11_Reward_1_Creatures_Number^:S-1;
+Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
+
+!!VRi^Arena_11_Reward_Experience^:S20000;       (The amount of Experience 1-9999999)
+
+!!VRi^Arena_11_Reward_1_Artifacts_Class^:S8;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
+!!VRi^Arena_11_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
+!!VRi^Arena_11_Reward_2_Artifacts_Class^:S-2;
+!!VRi^Arena_11_Reward_2_Artifacts_Specific^:S-1; 
+!!VRi^Arena_11_Reward_3_Artifacts_Class^:S-2;
+!!VRi^Arena_11_Reward_3_Artifacts_Specific^:S-1; 
+!!VRi^Arena_11_Reward_4_Artifacts_Class^:S-2;
+!!VRi^Arena_11_Reward_4_Artifacts_Specific^:S-1; 
+Random Artifacts can also be generated in a certain range x1-x2. If you want to use this option go to the reward section Line ~409 and enable the code. Certain artifacts like blank WoG artifacts or combination artifacts are banned by default and must be enabled by the modder. 
+At the end of the mod search for Check_Forbidden_Artifacts and remove the code to enable the artifacts or add new IDs.
+
+!!VRi^Arena_11_Reward_PrimSkill^:S-1;        (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random, 5-all)
+!!VRi^Arena_11_Reward_PrimSkill_Amount^:S-1; (1-99)
+
+!!VRi^Arena_11_Reward_Spell_Points^:S-1;     (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random)
+!!VRi^Arena_11_Reward_Spell^:S-1;            (-1=disabled, 0-69 Spell ID, 70=Random, 71=Random LvL1, 72=Random LvL2, 73=Random LvL3, 74=Random LvL4, 75=Random LvL5)
+
+!!VRi^Arena_11_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
+!!VRi^Arena_11_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_11_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
+
+
+
+
+
+
+
+
+
+
