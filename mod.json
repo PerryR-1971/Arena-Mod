@@ -25,6 +25,7 @@
 		"file": "arena2.ico",
 		"index": 0
 	},
+	"mod_version": "0.8",
 	"priority": 0,
 	"compatibility": {
 		"class": "default",
