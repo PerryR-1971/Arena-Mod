@@ -22,17 +22,16 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P5/?y80/?y81;
 
 !!VRs^Arena_5_CB_Name^:S^Arena 5^;
 !!VRs^Arena_5_Description^:S^{~r}Arena 5 {~>cprsmall.def:86}{~}
 
-Difficulty: {~green}Easy{~}
-Reward: 15000{~>SMALRES.def:6} and +1 to all primary stats
-
-Starts scaling after 3 month
-Description: an easy fight versus %Y10 Goblins.
-
-Specials: None^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | +1 to all primary stats
+Challenge: Fight %Y10 Goblins and Hobgoblins.
+Rules: No hero-level restriction.
+Tip: Area damage is effective against their large numbers.
+^; (Set the text that shows when you visit the CB)
 
 
 !?PI;

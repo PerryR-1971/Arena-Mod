@@ -22,18 +22,17 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P10/?y80/?y81;
 !!VRy90:Si^Arena_10_Reward_1_Artifacts_Random^;
 
 !!VRs^Arena_10_CB_Name^:S^Arena 10^;
 !!VRs^Arena_10_Description^:S^{~r}Arena 10 {~>cprsmall.def:117} {~>cprsmall.def:116} {~>cprsmall.def:115} {~>cprsmall.def:114}{~}
 
-Difficulty: {~blue}Medium{~}
-Cost: 10000{~>SMALRES.def:6}
-Reward: 100000{~>SMALRES.def:6} and Relic Artifact.
-
-Max Level requirement: 50
-Description: an fight versus %Y10 Elementals.
-^; (Set the text that shows when you visit the CB)^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | Relic artifact | Treasure artifact
+Challenge: Fight %Y10 Fire, Water, Earth and Air Elementals.
+Rules: Hero levels 20-50; 10% Magic Resistance; Enrage in round 6.
+Tip: Do not rely on damage from a single elemental school.
+^; (Set the text that shows when you visit the CB)
 
 
 !?PI;
@@ -125,5 +124,3 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!VRi^Arena_10_Reward_Scales^:S0;  (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
 !!VRi^Arena_10_Reward_Scales_with_size^:S0;(1=yes, 0=no, Requires Arena_10_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
-
-

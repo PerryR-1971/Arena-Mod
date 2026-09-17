@@ -22,10 +22,9 @@ after battle.
 
 When clicking on System Icon at Adventure Map run options again
 !?CM&1000&i^Arena_Mod_Active^=1;
-!!FU:E;                                 [temporarily disabled]
 !!CM:F?v3 I?v4 S?v5;                    [where we click and click subtype]
 !!if&v3=512/v4=10;                      [if right click on System Icon  are clicked]
-!!FU(Arena_Boss_Settings_DL):P;
+!!FU(Configure_Arena_mod):P;
 !!en;
 
 
@@ -112,6 +111,8 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!VRy1:S1R1;                          [Choose a random page to open between 1 and 2]
   !!SN&y1=1:W^Arena_Pages^/1;           [When DL is created start with first page]
   !!SN&y1=2:W^Arena_Pages^/2;           [When DL is created start with first page]
+  !!SN:T^AC_Arena.Menu_Page^/?z1/^page^/y1;
+  !!DL379:A2/3/z1/1;                    [Show the complete page label when the dialogue opens]
 
 *Set name of Arenas that appear in the text field
   
@@ -133,21 +134,46 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!en;
 
   !!if&y1=1;
-    !!DL379:A6/3/^Easy^/1;              [Set name/category of first colume]
-    !!DL379:A7/3/^Medium^/1;            [Set name/category of second colume]
-    !!DL379:A8/3/^Hard^/1;              [Set name/category of third colume]
+    !!SN:T^AC_Arena.Menu_Easy^/?z1;
+    !!DL379:A6/3/z1/1;              [Set name/category of first colume]
+    !!SN:T^AC_Arena.Menu_Medium^/?z2;
+    !!DL379:A7/3/z2/1;            [Set name/category of second colume]
+    !!SN:T^AC_Arena.Menu_Hard^/?z3;
+    !!DL379:A8/3/z3/1;              [Set name/category of third colume]
   !!en;
 
   !!if&y1=2;
-    !!DL379:A6/3/^Bossbattle^/1;        [Set name/category of first colume]
-    !!DL379:A7/3/^Bossbattle^/1;        [Set name/category of second colume]
-    !!DL379:A8/3/^Bossbattle^/1;        [Set name/category of third colume]
+    !!SN:T^AC_Arena.Menu_Boss_Battle^/?z1;
+    !!DL379:A6/3/z1/1;        [Set name/category of first colume]
+    !!DL379:A7/3/z1/1;        [Set name/category of second colume]
+    !!DL379:A8/3/z1/1;        [Set name/category of third colume]
   !!en;
 
 *Here save all heroes parameter so they can be restored after combat*
   !!HEx1:P?y30/?y31/?y32;               [Check current hero position]
   !!COx1:D?y40;                         [Check if Commander is Dead or Alive]
   !!SN:W^Arena_Commander_Check^/y40;    [Save commander status]
+
+  *Save the Henchman alive/dead status. Henchmen are separate battle stacks and not part of the hero army slots.
+  !!UN:P49/?y41;                        [Check whether the WoG Henchmen option is enabled]
+  !!SN:W^Arena_Henchman_Backup_Valid^/0;
+  !!SN:W^Arena_Enhanced_Henchman_Backup_Valid^/0;
+  !!if&y41=1;
+    !!IF:Wx1;                           [Select the Arena hero's W variables]
+    !!VRy42:Sw119;                      [0 = dead, 1 = alive]
+    !!SN:W^Arena_Henchman_Alive^/y42;
+    !!SN:W^Arena_Henchman_Backup_Valid^/1;
+
+    *Enhanced Henchmen resets stack experience and returns its banner when the Henchman dies.
+    !!if&y42=1/i^enhanced_henchmen_on^;
+      !!VRy43:Si^hench_stackExp_%X1^;
+      !!VRy44:Si^hench_banner_%X1^;
+      !!SN:W^Arena_Henchman_StackExp^/y43;
+      !!SN:W^Arena_Henchman_Banner^/y44;
+      !!SN:W^Arena_Enhanced_Henchman_Backup_Valid^/1;
+    !!en;
+  !!en;
+
   *!HEx1:I?y33/1;                       [Get Hero Spell Points]
   *!SN:W^Arena_Hero_Spell_Points^/y33;  [Save Spell Points]
   !!re i/0/6;                           [cycle hero slots and save army to restore it later]
@@ -163,10 +189,7 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!VRz1:S^Human Training Center 01.wav^; !!SN:Pz1; [Play gold and door sound]
 
 *Set Hint texts
-  !!SN:T^AC_Arena.Hint_1^/?z40;  
-  !!re i/20/34;  
-    !!DL379:Hi/40/1;                    [Set hint text]
-  !!en;  
+  !!FU(Arena_Update_Challenge_Hints):Py1;
 
   !!SN:T^AC_Arena.Hint_2^/?z41;    
   !!DL379:H1/41/1;                      [Set hint text]
@@ -183,6 +206,20 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
     !!re i/50/64;
       !!FU(gem_DlgItem_Show):Pi/0/0/0/(dlg); [hide all cadres]
     !!en;
+  !!en;
+
+  *Hide all completion marks, then show only defeated Boss Arenas.
+  !!FU(DL_FindById):P379/?(markDlgPtr:y);
+  !!UN:C(markDlgPtr)/4/?(markDlg:y);
+  *Keep both page-change buttons visible when the Arena dialogue is rebuilt.
+  !!FU(gem_DlgItem_Show):P13/1/0/0/(markDlg);
+  !!FU(gem_DlgItem_Show):P14/1/0/0/(markDlg);
+  !!re i/65/79;
+    !!FU(gem_DlgItem_Show):Pi/0/0/0/(markDlg);
+  !!en;
+  !!SN:W^Arena_Pages^/?y1;              [reload after dialog helper functions]
+  !!if&y1=2;
+    !!FU(Arena_Update_Boss_Completion_Marks):Px1/(markDlg);
   !!en;
 
   !!DL379:S;                            [Show dialouge]
@@ -223,6 +260,7 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
 !?FU(Arena_Fight_and_reward);
 
 !!if&x2>0;    
+  !!FU(Arena_Show_Entry_Danger):Px1/x2; [Show the current comparison once more immediately before combat]
   !!FU(Arena_Challenge):Px2/x1;         [Jump to Arena function and pass Arena number and Hero]
   !!SN&x3=1:W^Arena_Close_TownScreen^/0;  
   
@@ -252,6 +290,32 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!SN:W^Arena_Commander_Check^/?y40;   [Check commander status from before Battle]
   !!COx1:Dy40;                          [Restore commmander status]
 
+  *Restore the Henchman status from before the Arena battle without changing its creature type.
+  !!SN:W^Arena_Henchman_Backup_Valid^/?y41;
+  !!if&y41=1;
+    !!SN:W^Arena_Henchman_Alive^/?y42;
+    !!IF:Wx1;                           [Select the Arena hero's W variables]
+    !!VRy43:Sw119;                      [Status immediately after the Arena battle]
+    !!VRw119:Sy42;                      [Restore alive/dead status]
+
+    *Only roll back Enhanced Henchmen death penalties. Surviving Henchmen keep experience gained in the Arena.
+    !!SN:W^Arena_Enhanced_Henchman_Backup_Valid^/?y44;
+    !!if&y44=1/y42=1/y43=0;
+      !!SN:W^Arena_Henchman_StackExp^/?y45;
+      !!SN:W^Arena_Henchman_Banner^/?y46;
+      !!VRy47:Si^hench_banner_%X1^;     [Current banner after battle]
+
+      *A dead Enhanced Henchman returns its equipped banner to the backpack. Remove that returned copy before restoring it.
+      !!if&y46>=0/y47<0;
+        !!HEx1:A2/(ART_WARLORDS_BANNER)/?y48/?y49;
+        !!HEx1&y48>0:A3/(ART_WARLORDS_BANNER)/1/0;
+      !!en;
+
+      !!VRi^hench_stackExp_%X1^:Sy45;
+      !!VRi^hench_banner_%X1^:Sy46;
+    !!en;
+  !!en;
+
   !!FU(Arena_Mod_Reward):Px2/x1;        [In case of creature reward jump there]
 
   *!HEx1:I?y33/1;                       [Get Hero Spell Points]
@@ -270,6 +334,8 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
 *Set text and names for arena and handle left clicks in the Arena Main DL
 !?DL&v998=379/v1000=13;                 [left click on the challenges to show short description in info field]
 
+!!VRv999&v999>=65/v999<=79:-45;         [Treat clicks on completion marks like clicks on the Boss portraits]
+
 *!SN&v999=20:T^AC_Arena.Level_%X1_Short_Text^/?z10; [set text for 1st]
 *!SN:T^AC_Arena.Header_Text^/?z80;      [z80]
 *!DL379:A5/3/z80/1;                     [Welcome text]
@@ -278,7 +344,8 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
 !!SN:W^Arena_Pages^/?y99;               [Get number of page]
 !!SN&y99>3:W^Arena_Pages^/1;            [Get number of page]
 !!SN:W^Arena_Pages^/?y99;               [Get number of page]
-!!DL379:A2/3/^Page:%Y99^/1;             [Show text in description field]
+!!SN:T^AC_Arena.Menu_Page^/?z1/^page^/y99;
+!!DL379:A2/3/z1/1;             [Show text in description field]
 
 *play sounds
 !!SN:W^Arena_Hero^/?y5;                 [Get hero who is visiting the Arena]
@@ -305,8 +372,9 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!SN:W^Arena_Pages^/d-1;              [Get number of page]
   !!SN:W^Arena_Pages^/?y99;             [Get number of page]
   !!SN&y99<1:W^Arena_Pages^/3;          [Get number of page]
-  !!DL379:A2/3/^%Y99^/1;                [Show text in description field]
   !!SN:W^Arena_Pages^/?y99;             [Get number of page]  
+  !!SN:T^AC_Arena.Menu_Page^/?z1/^page^/y99;
+  !!DL379:A2/3/z1/1;                    [Show the complete translated page label]
   !!DL379:A10/3/^^/1;                   [empty text field when DL is created]
 !!en;
 
@@ -315,8 +383,9 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!SN:W^Arena_Pages^/d1;               [Get number of page]
   !!SN:W^Arena_Pages^/?y99;             [Get number of page]
   !!SN&y99>3:W^Arena_Pages^/1;          [Get number of page]
-  !!DL379:A2/3/^%Y99^/1;                [Show text in description field]
   !!SN:W^Arena_Pages^/?y99;             [Get number of page]  
+  !!SN:T^AC_Arena.Menu_Page^/?z1/^page^/y99;
+  !!DL379:A2/3/z1/1;                    [Show the complete translated page label]
   !!DL379:A10/3/^^/1;                   [empty text field when DL is created]
 !!en;
 
@@ -343,9 +412,12 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!VRy10&v999=33:S14;
   !!VRy10&v999=34:S15;
 
-  !!DL379:A6/3/^Easy^/1;                [Set name/category of first colume]
-  !!DL379:A7/3/^Medium^/1;              [Set name/category of second colume]
-  !!DL379:A8/3/^Hard^/1;                [Set name/category of third colume]
+  !!SN:T^AC_Arena.Menu_Easy^/?z1;
+  !!DL379:A6/3/z1/1;                [Set name/category of first colume]
+  !!SN:T^AC_Arena.Menu_Medium^/?z2;
+  !!DL379:A7/3/z2/1;              [Set name/category of second colume]
+  !!SN:T^AC_Arena.Menu_Hard^/?z3;
+  !!DL379:A8/3/z3/1;                [Set name/category of third colume]
 !!en;
 
 !!if&y99=2;                             [If on First Page]
@@ -370,9 +442,10 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!VRy10&v999=33:S29;
   !!VRy10&v999=34:S30;
 
-  !!DL379:A6/3/^Bossbattle^/1;             [Set name/category of first colume]
-  !!DL379:A7/3/^Bossbattle^/1;          [Set name/category of second colume]
-  !!DL379:A8/3/^Bossbattle^/1;              [Set name/category of third colume]
+  !!SN:T^AC_Arena.Menu_Boss_Battle^/?z1;
+  !!DL379:A6/3/z1/1;             [Set name/category of first colume]
+  !!DL379:A7/3/z1/1;          [Set name/category of second colume]
+  !!DL379:A8/3/z1/1;              [Set name/category of third colume]
 !!en;
 
 !!if&y99=3;                             [If on First Page]
@@ -416,6 +489,12 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   *!IF:M^y5 is%Y5 and y90 is%Y90^;
 
   !!VRz10:Ss^Arena_%Y50_Description^;   [Set text that will show in the description field]
+  !!if&y50>=1/y50<=30;
+    !!FU(Arena_Get_Danger_Text):Py5/y50/?z11;
+    !!VRz10:S^%Z10
+
+%Z11^;
+  !!en;
   *!IF:M^Text field contains %V999^;
   !!DL379&v999>=20/v999<=34:A10/3/^%Z10^/1;               [Show text in description field]
   !!DL379|v999=13/v999=14:A10/3/^^/1;   [empty text field when left or right arrow is clicked]
@@ -441,7 +520,9 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
   !!VRzv999:Ss^Arena_%Y60_CB_Name^;     [get name from template]
   !!VRzv999:S^{~r}%Zv999{~}^;           [make name red]
   !!DL379&v999>=20/v999<=34:Av999/3/zv999/1; [set name of arena]
-  !!DL379:A2/3/^Page:%Y99^/1;           [Show text in description field]
+  !!SN:T^AC_Arena.Menu_Page^/?z1/^page^/y99;
+  !!DL379:A2/3/z1/1;           [Show text in description field]
+  !!FU(Arena_Update_Challenge_Hints):Py99;
 !!en;
 
 
@@ -461,6 +542,19 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
     !!FU(gem_DlgItem_Show):Pi/0/0/0/(dlg); [hide all cadres]
   !!en;
 !!en;
+
+*Refresh the Boss completion marks after changing pages.
+!!FU(DL_FindById):P379/?(markDlgPtr:y);
+!!UN:C(markDlgPtr)/4/?(markDlg:y);
+!!re i/65/79;
+  !!FU(gem_DlgItem_Show):Pi/0/0/0/(markDlg);
+!!en;
+!!SN:W^Arena_Pages^/?y1;                [reload after dialog helper functions]
+!!SN:W^Arena_Hero^/?y60;
+!!if&y1=2;
+  !!FU(Arena_Update_Boss_Completion_Marks):Py60/(markDlg);
+!!en;
+!!FU(gem_DlgItem_Show):P2/1/0/1/(markDlg); [redraw the complete dialog]
 
 *Check certain requirements to enter the arena
   !!SN:W^Arena_Challenge_Number^/?y10;
@@ -563,6 +657,49 @@ x1=Hero ID, x2= 1 means we enter from a town, x2=2 means we enter from Arena map
       !!DL:C1;
 
 
+!?FU(Arena_Update_Challenge_Hints);
+x1=current Arena page
+
+  !!re i/20/34;
+    !!VRy40&x1=1:Si-19;                 [Arena 1-15]
+    !!VRy40&x1=2:Si-4;                  [Arena 16-30]
+    !!VRy40&x1=3:Si+11;                 [Reserved Arena 31-45 page]
+    !!SN:T^AC_Arena.Hint_1^/?z40/^arena^/y40;
+    !!DL379:Hi/40/1;
+  !!en;
+
+
+!?FU(Arena_Get_Current_Difficulty_Labels);
+Writes the translated Standard and Boss difficulty names to z90 and z91
+
+  !!SN:W^Arena_Normal_Difficulty^/?y40;
+  !!VRy40|y40<1/y40>4:S2;
+  !!SN&y40=1:T^Arena_Config.Peasant_Label^/?z90;
+  !!SN&y40=2:T^Arena_Config.Warrior_Label^/?z90;
+  !!SN&y40=3:T^Arena_Config.Berserk_Label^/?z90;
+  !!SN&y40=4:T^Arena_Config.Chieftain_Label^/?z90;
+
+  !!SN:W^Arena_Boss_Difficulty^/?y41;
+  !!VRy41|y41<1/y41>4:S2;
+  !!SN&y41=1:T^Arena_Config.Peasant_Label^/?z91;
+  !!SN&y41=2:T^Arena_Config.Warrior_Label^/?z91;
+  !!SN&y41=3:T^Arena_Config.Berserk_Label^/?z91;
+  !!SN&y41=4:T^Arena_Config.Chieftain_Label^/?z91;
+
+
+!?FU(Arena_Update_Boss_Completion_Marks);
+x1=Hero ID, x2=current dialog structure
+
+  !!HEx1:O?x3;                          [current player]
+  !!re i/16/30;
+    !!SN:W^Arena_%i_Player%X3_wins^/?y62;
+    !!VRy63:Si+49;                      [Arena 16 maps to dialog item 65]
+    !!if&y62>0;
+      !!FU(gem_DlgItem_Show):Py63/1/0/0/x2;
+    !!en;
+  !!en;
+
+
 !?FU(Check_Arena_Requirements);
 This fct checks if an arena can be visited by the current hero. If not it will set a "locked variable" that can be later used
 x1=Arena Number ID
@@ -608,7 +745,7 @@ x1=Arena Number ID
       !!SN:W^Arena_%X1_locked^/6;
     !!en;
 
-    !!if&x1>=16/x1<=30/i^Advanced_Classes_Mod_Active^=0; [Bossbattle Arena can only be visited when ACM is active]
+    !!if&x1>=16/x1<=30/i^Advanced_Classes_Mod_Active^=0; [Boss Battle Arena can only be visited when ACM is active]
       !!SN:W^Arena_%X1_locked^/7;
     !!en;
   !!en;
@@ -617,6 +754,8 @@ x1=Arena Number ID
 *Handle right clicks in the main arena dialouge and show additional information on right click
 !?DL&v998=379/v1000=14;                 [right click on the challenges to show details about the selected arena]
 
+  !!VRv999&v999>=65/v999<=79:-45;       [Treat right clicks on completion marks like clicks on the Boss portraits]
+  !!FU|v999<20/v999>34:E;               [Ignore all other dialog elements]
   !!VRz9:S^^;                           [Set to blank text first]
   !!SN:W^Arena_Pages^/?y99;             [Get number of page]
   !!VRz9|v999<20/v999>34:S^^;           [Set to no text if not clicked on levels]
@@ -632,23 +771,24 @@ x1=Arena Number ID
   !!UN:C5203412/2/4/d-100;
   !!UN:C5203503/1/4/d-100;              [reduc window length]
 
-!?DL&v998=379/v999=5/v1000=14;          [When clicking on the close Button close DL]
+
+!?DL&v998=379/v999=5/v1000=14;          [Show Arena rules when right-clicking the heading]
 
   !!DL381:N^arena4.txt^;                [parse dialogue]
-  !!VRz1:S^Rules of the Arena Battle:
-
-  -You cannot die or lose creatures during an arena battle. 
-  -So no need to savescum. Everything will be restored in case of win or lose.
-  -You can only visit once per week.
-  -Visiting arenas costs a little money to compensate the arena master for his trouble.
-  -Visting arenas costs 200 movement points.
-  -Certain arenas have a scaling with game time.
-  -You can get additional information when rmc the arena.
-  -rmc the boss to see his stats.^;                           [Set text]
+  !!FU(Arena_Get_Current_Difficulty_Labels):P;
+  !!SN:T^AC_Arena.Rules_Text^/?z1/^standard_difficulty^/z90/^boss_difficulty^/z91;
  
   !!DL381:A2/3/z1/1;
   !!FU(DL_ShowPopup):P381;              [Show Popup DL]
-   
+
+
+!?DL&v998=379/v999=1/v1000=14;          [Show current difficulty when right-clicking the Arena Master]
+
+  !!DL381:N^arena4.txt^;
+  !!FU(Arena_Get_Current_Difficulty_Labels):P;
+  !!SN:T^AC_Arena.Difficulty_Overview^/?z1/^standard_difficulty^/z90/^boss_difficulty^/z91;
+  !!DL381:A2/3/z1/1;
+  !!FU(DL_ShowPopup):P381;
 
 !?DL&v998=379/v999=30721/v1000=13;      [When clicking on the close Button close DL]
   !!SN:W^Arena_Challenge_Number^/0;     [reset the current arena selection]
@@ -815,6 +955,9 @@ x1=Arena Number, x2=hero ID
 !!VRy46:Si^Arena_%X1_Reward_Gold^;
 !!VRy47:Si^Arena_%X1_Reward_Mithril^;
 
+!!FU(Arena_Apply_Reward_Difficulty):Px1/y5/?y5;   [Scale experience with the selected arena difficulty]
+!!FU(Arena_Apply_Reward_Difficulty):Px1/y46/?y46; [Scale gold with the selected arena difficulty]
+
 !!VRy48:Si^Arena_%X1_Reward_Spell_Points^;
 !!VRy49:Si^Arena_%X1_Reward_Spell^;
 
@@ -902,7 +1045,7 @@ x1=Arena Number, x2=hero ID
   !!IF&1000:Q1/5/y45/1^Having defeated the %Z1, you discover %Y45 Gems.^;
   !!OW:R-1/5/dy45;
 !!en:;
-!!if&y46>0/y46<=1000000:;                (Gold Reward)
+!!if&y46>0:;                              (Gold Reward)
   !!VRy8:Si^Arena_%X1_Guards_Type_Slot_0^; !!VRy8&y8=-1:Si^Arena_%X1_Guards_Type_Slot_1^; !!VRy8&y8=-1:Si^Arena_%X1_Guards_Type_Slot_2^; !!VRy8&y8=-1:Si^Arena_%X1_Guards_Type_Slot_3^; !!VRy8&y8=-1:Si^Arena_%X1_Guards_Type_Slot_4^;
   !!UN:N3/1/y8/2;
   !!IF&1000:Q1/6/y46/1^Having defeated the %Z1, you discover %Y46 Gold.^;
@@ -1067,6 +1210,7 @@ x1=Arena Number, x2=hero ID
 !!en:;
 
 
+*Handle special rewards and text after won fights here*
 !?FU(Arena_ACM_Rewards);
 x1=Arena ID, x2=Hero ID
 !!VRz1:Ss^Arena_%X1_Boss_Name^; [get Arena Boss Name]
@@ -1164,6 +1308,7 @@ x1=Arena ID, x2=Hero ID
 [Arena 24]
 !!if&x1=24;                             
   !!SN:W^ACM_Reward_Scouting_Chance_%X2^/d50;
+  !!SN:W^Arena_Reward_%X2_Com_Speed^/d15;
    
   !!IF&1000:M^Having defeated the {~r}%Z1{~}, you get:
 
@@ -1191,11 +1336,11 @@ x1=Arena ID, x2=Hero ID
 
 [Arena 26]
 !!if&x1=26;                             
-  !!SN:W^Arena_Reward_%X2_Luck_Damage^/d15; 
+  !!SN:W^Arena_Reward_%X2_Luck_Damage^/d10; 
   !!SN:W^Arena_Reward_%X2_Luck_Chance^/d1; 
   !!IF&1000:M^Having defeated the {~r}%Z1{~}, you get:
 
-  {~r}+15%{~} Luck strike damage
+  {~r}+10%{~} Luck strike damage
   {~r}+1{~} Luck crit chance!^;
 !!en;
 
@@ -1210,14 +1355,16 @@ x1=Arena ID, x2=Hero ID
 !!en;
 
 [Arena 28]
-*!if&x1=27;                             
-  *!SN:W^Arena_Reward_%X2_Magic_Str_Water^/d10; 
-  *!SN:W^Arena_Reward_%X2_Spell_dmg_Water^/d20; 
-  *!IF&1000:M^Having defeated the {~r}%Z1{~}, you get:
+!!if&x1=28;                             
+  !!SN:W^Arena_Reward_%X2_Magic_Pierce^/d5;
+  !!SN:W^Arena_Reward_%X2_Warrior_Class_Point^/d1;
+  !!SN:W^Arena_Reward_%X2_Mage_Class_Point^/d1;
+  !!SN:W^Arena_Reward_%X2_Adventurer_Class_Point^/d1; 
+  !!IF&1000:M^Having defeated the {~r}%Z1{~}, you get:
 
-  {~r}+20%{~} Water spell damage
-  {~r}+10{~} Magic Strength for Water spells!^;
-*!en;
+  {~r}+1{~} to all class points
+  {~r}+5%{~} Magic Pierce^;
+!!en;
 
 [Arena 29]
 !!if&x1=29;                             
@@ -1232,7 +1379,9 @@ x1=Arena ID, x2=Hero ID
 !!en;
 
 [Arena 30]
-!!if&x1=30;                             
+!!if&x1=30;
+  !!SN:W^Arena_Reward_%X2_Bonus_HP^/d10;
+  !!SN:W^Arena_Reward_%X2_Bonus_Speed^/d1;                             
   !!SN:W^Commander_Kill_Counter_%X2^/d10;[increase current kill count by 10] 
   !!IF&1000:M^Having defeated the {~r}%Z1{~}, you get:
 
@@ -1242,23 +1391,71 @@ x1=Arena ID, x2=Hero ID
 !!en;
 
 
-!?FU(OnCombatRound)&v997=0; !!FU:E;
+*Add Bonus Speed
+!?FU(OnCombatRound)&v997=0;
+
+!!BH0:N?y99;                            [Attacker]
+!!SN:W^Arena_Reward_%Y99_Bonus_Speed^/?y10;[get bonus value]
+!!if&y10>0;
 !!re i/0/20;                            [loop attacker stacks]
   !!BMi:T?y1 N?y2; !!FU&y2=0:E;         [get unit type and number]
   !!FU|y1=145/y1=146/y1=147/y1=148/y1=149:E; [Execlude Warmachines]
-  !!BMi:H?y1;                           [get current HP]
-  !!VRy1:*110:100;                      [increase value]
-  !!BMi:Hy1 S1;                         [increase HP and speed]
+  !!BMi:Sdy10;                          [increase speed]
+!!en;
+!!en;
+
+!!BH1:N?y99;                            [Defender]
+!!FU&y99<0:E;                           [Exit if no defender hero]
+!!SN:W^Arena_Reward_%Y99_Bonus_Speed^/?y10;[get bonus value]
+!!if&y10>0;
+!!re i/21/41;                           [loop attacker stacks]
+  !!BMi:T?y1 N?y2; !!FU&y2=0:E;         [get unit type and number]
+  !!FU|y1=145/y1=146/y1=147/y1=148/y1=149:E; [Execlude Warmachines]
+  !!BMi:Sdy10;                          [increase speed]
+!!en;
 !!en;
 
 
+*Add Bonus HP
+!?FU(OnCombatRound)&v997=0;
+
+!!BH0:N?y99;                            [Attacker]
+!!SN:W^Arena_Reward_%Y99_Bonus_HP^/?y10;[get bonus value]
+!!if&y10>0;
+!!re i/0/20;                            [loop attacker stacks]
+  !!BMi:T?y1 N?y2; !!FU&y2=0:E;         [get unit type and number]
+  !!FU|y1=145/y1=146/y1=147/y1=148/y1=149:E; [Execlude Warmachines]
+  !!BMi:H?y1;                           [get current HP]  
+  !!VRy11:S100+y10;                     [make percentage value]
+  !!VRy1:*y11:100;                      [increase value]
+  !!BMi:Hy1;                            [increase HP]
+!!en;
+!!en;
+
+!!BH1:N?y99;                            [Defender]
+!!FU&y99<0:E;
+!!SN:W^Arena_Reward_%Y99_Bonus_HP^/?y10;[get bonus value]
+!!if&y10>0;
+!!re i/21/41;                           [loop attacker stacks]
+  !!BMi:T?y1 N?y2; !!FU&y2=0:E;         [get unit type and number]
+  !!FU|y1=145/y1=146/y1=147/y1=148/y1=149:E; [Execlude Warmachines]
+  !!BMi:H?y1;                           [get current HP]
+  !!VRy11:S100+y10;                     [make percentage value]
+  !!VRy1:*y11:100;                      [increase value]
+  !!BMi:Hy1;                            [increase HP]
+!!en;
+!!en;
+
+
+
+****************************************************************************************************
+*Handle Creature Position Here*
 !?FU(OnSetupBattlefield);
 !!SN:W^Arena_Challenge_Number^/?y1;
 !!FU(Arena_Mod_OnSetupBattlefield):Py1; [Pass Arena Challenge Number]
 
 
 !?FU(Arena_Mod_OnSetupBattlefield);
-*Handle Creature Position Here*
 
 !!VRy10:Si^Arena_Fight^; 
 !!FU&y10=0:E;                           (Exit if it is not Creature Bank Fight)
@@ -1317,41 +1514,49 @@ x1=Arena ID, x2=Hero ID
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_0^;      
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_0^; !!VRy2&y80>0/y47>0:Sy47;   
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0:Sy1/y2/15/1/0/0;        (Summon First creature number and type at position)
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_1^;      
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_1^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0:Sy1/y2/185/1/1/0;       (Summon second guards)
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_2^;     
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_2^; !!VRy2&y80>0/y47>0:Sy47;   
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0/y99=0/y50=1:Sy1/y2/172/1/2/0;
 !!BU&y1>=0/y2>0/y99=1:Sy1/y2/174/1/2/0; (Fix for Quick Combat because he cant summon there, idk why)
 !!BU&y1>=0/y2>0/y99=0/y50=0:Sy1/y2/49/1/2/0;
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_3^;     
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_3^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0/y99=0/y50=1:Sy1/y2/2/1/3/0;
 !!BU&y1>=0/y2>0/y99=1:Sy1/y2/12/1/3/0;  (Fix for Quick Combat because he cant summon there, idk why)
 !!BU&y1>=0/y2>0/y99=0/y50=0:Sy1/y2/151/1/3/0;
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_4^;      
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_4^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0:Sy1/y2/100/1/4/0;
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_5^;      
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_5^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0/y99=0/y50=1:Sy1/y2/87/1/5/0;
 !!BU&y1>=0/y2>0/y99=1:Sy1/y2/133/1/5/0; (Fix for Quick Combat because he cant summon there, idk why)
 !!BU&y1>=0/y2>0/y99=0/y50=0:Sy1/y2/83/1/5/0;
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_6^;     
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_6^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0/y50=1:Sy1/y2/8/1/6/0;
 !!BU&y1>=0/y2>0/y50=0:Sy1/y2/117/1/6/0;
 
 !!VRy1:Si^Arena_%X1_Guards_Type_Slot_7^;     
 !!VRy2:Si^Arena_%X1_Guards_Number_Slot_7^; !!VRy2&y80>0/y47>0:Sy47;  
+!!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
 !!BU&y1>=0/y2>0/y50=1:Sy1/y2/178/1/7/0;
 !!BU&y1>=0/y2>0/y50=0:Sy1/y2/94/1/7/0;
 
@@ -1405,9 +1610,8 @@ x1=Arena ID, x2=Hero ID
     !!VRz-1:S^Lord_Xeen_Laugh.wav^;
     !!SN:Pz-1;                          [play laugh sound]
   !!en;
-  !!IF:M^The win condition has not been fullfilled.
-
-   {~r}You loose!{~}^;
+  !!SN:T^AC_Arena.Battle_Lost^/?z1;       [get translated loss message]
+  !!IF:M^%Z1^;
 
   !!BU:V0;                              [Win the battle immidiatly for defender]
 !!en;
@@ -1419,7 +1623,8 @@ x1=Arena ID, x2=Hero ID
 
 !!if&y1<=v997;
   !!BA:Q?j;                             [check for quick battle]
-  !!IF&j=0:L^{~r}The creatures getting enraged and have their stats increased!{~}^;
+  !!SN:T^AC_Arena.Battle_Enrage^/?z1;     [get translated enrage message]
+  !!IF&j=0:L^%Z1^;
 
   !!VRy10:S10;                          [Attack]
   !!VRy11:S10;                          [Defense]
@@ -1504,7 +1709,8 @@ If it finds a not banned artifact the loop will end and the ID of the artifact w
 
 !!re r/1/30;                            (loop 30 times to possibly grow creatures in the Arenas)
   !!VRy20:Si^Arena_%r_Custom_Growth^;   (check if option is enabled)
-  !!VRy21:Si^Arena_%r_Custom_Growth_Start^;   (check when the growth should start)  
+  !!VRy21:Si^Arena_%r_Custom_Growth_Start^;   (check when the growth should start)
+  !!FU(Arena_Get_Effective_Growth_Start):Pr/y21/?y21;
   !!if&x2=7/y20>0/y21<=i^timerWeek^;    (if the exponential growth option is active and it is the last day of the week)
     !!VRy20:+100;                       (make percentage based)
     !!re i/0/7/1;                       (loop through all slots)
@@ -1516,6 +1722,7 @@ If it finds a not banned artifact the loop will end and the ID of the artifact w
 
   !!VRy20:Si^Arena_%r_Custom_Growth_Linear^; (check if option is enabled)
   !!VRy21:Si^Arena_%r_Custom_Growth_Start^;   (check when the growth should start)
+  !!FU(Arena_Get_Effective_Growth_Start):Pr/y21/?y21;
   !!if&y20>0/y21<=i^timerWeek^;         (if the linear growth option is active and it is the last day of the week)
     !!re i/0/7/1;                       (loop through all slots)
       !!VRy1:Si^Arena_%r_Guards_Number_Slot_%i^;      
@@ -1526,15 +1733,202 @@ If it finds a not banned artifact the loop will end and the ID of the artifact w
 !!en;
 
 
+!?FU(Arena_Apply_Normal_Guard_Difficulty);
+*x1 = Arena number, x2 = base guard number, x3 = difficulty-scaled guard number
+!!VRx3:Sx2;
+!!FU|x1<1/x1>15/x2<=0:E;
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!VRy1|y1<1/y1>4:S2;                   [Use Warrior when no valid difficulty was selected]
+!!VRx3&y1=1:*50:100;
+!!VRx3&y1=3:*150:100;
+!!VRx3&y1=4:*200:100;
+!!VRx3&x3<1:S1;                        [Keep every configured positive stack at least at one creature]
+
+
+!?FU(Arena_Apply_Reward_Difficulty);
+*x1 = Arena number, x2 = base reward, x3 = difficulty-scaled reward
+!!VRx3:Sx2;
+!!FU|x1<1/x1>30/x2<=0:E;
+!!if&x1<=15;
+  !!SN:W^Arena_Normal_Difficulty^/?y1;
+!!el;
+  !!SN:W^Arena_Boss_Difficulty^/?y1;
+!!en;
+!!VRy1|y1<1/y1>4:S2;                   [Use Warrior when no valid difficulty was selected]
+!!VRx3&y1=1:*50:100;
+!!VRx3&y1=3:*150:100;
+!!VRx3&y1=4:*200:100;
+!!VRx3&x3<1:S1;                        [Keep every configured positive reward at least at one]
+
+
+!?FU(Arena_Apply_Boss_Effect_Difficulty);
+*x1 = effect value on Warrior difficulty, x2 = difficulty-scaled effect value
+!!VRx2:Sx1;
+!!FU&x1<=0:E;
+!!SN:W^Arena_Boss_Difficulty^/?y1;
+!!VRy1|y1<1/y1>4:S2;                   [Use Warrior when no valid difficulty was selected]
+!!VRx2&y1=1:*50:100;
+!!VRx2&y1=3:*150:100;
+!!VRx2&y1=4:*200:100;
+!!VRx2&x2<1:S1;                        [Keep every configured positive effect at least at one]
+
+
+!?FU(Arena_Get_Scaled_Rewards);
+*x1 = Arena number, x2 = scaled gold reward, x3 = scaled experience reward
+!!VRx2:Si^Arena_%X1_Reward_Gold^;
+!!VRx3:Si^Arena_%X1_Reward_Experience^;
+!!FU(Arena_Apply_Reward_Difficulty):Px1/x2/?x2;
+!!FU(Arena_Apply_Reward_Difficulty):Px1/x3/?x3;
+
+
+!?FU(Arena_Get_Effective_Growth_Start);
+*x1 = Arena number, x2 = configured growth start week, x3 = difficulty-adjusted week
+!!VRx3:Sx2;
+!!FU|x1<1/x1>15/x2<=0:E;
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!VRy1|y1<1/y1>4:S2;                   [Use Warrior when no valid difficulty was selected]
+!!VRx3&y1=1:+2;
+!!VRx3&y1=3:-1;
+!!VRx3&y1=4:-2;
+!!VRx3&x3<1:S1;                        [Growth cannot start before week one]
+
+
 !?FU(Arena_Calc_Guard_Numbers);
 *gets the total amount of creatures in this arena
 !!VRx2:S0;
 *!re r/1/30;                            (loop 30 times to possibly grow creatures in the Arenas)
     !!re i/0/7/1;                       (loop through all slots)
       !!VRy1:Si^Arena_%X1_Guards_Number_Slot_%i^;
+      !!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y1/?y1;
       !!VRx2&y1>0:+y1;                       (accumulate guards and add up in x2      
     !!en:;  
 *!en;
+
+
+!?FU(Arena_Get_Hero_Fight_Value);
+*x1 = hero ID
+*x2 = adjusted Fight Value, x3 = base army Fight Value
+*x4 = Attack, x5 = Defense, x6 = hero level, x7 = number of learned secondary skills
+!!VRx2:S0;
+!!VRx3:S0;
+!!VRx4:S0;
+!!VRx5:S0;
+!!VRx6:S0;
+!!VRx7:S0;
+!!FU|x1<0/x1>155:E;
+!!re i/0/6;
+  !!VRy1:S-1;
+  !!VRy2:S0;
+  !!HEx1:C0/i/?y1/?y2;
+  !!if&y1>=0/y2>0;
+    !!MA:Fy1/?y3;
+    !!VRy3:*y2;
+    !!VRx2:+y3;
+  !!en;
+!!en;
+!!VRx3:Sx2;                             [Keep the unmodified army Fight Value]
+
+!!HEx1:F?y4/?y5/d/d E?y6/?y7/1;       [Get Attack, Defense and hero level]
+!!VRx4:Sy4;
+!!VRx5:Sy5;
+!!VRx6:Sy7;
+
+!!re i/0/27;                            [Count learned secondary skills]
+  !!HEx1:Si/?y8;
+  !!VRx7&y8>0:+1;
+!!en;
+
+*Hero multiplier: 100% base +2% per Attack/Defense +1% per level +5% per learned skill.
+!!VRy9:Sx4+x5;
+!!VRy9:*2;
+!!VRy10:Sx7*5;
+!!VRy11:S100+y9+x6+y10;
+*Divide before multiplying to avoid overflowing the 32-bit ERM variables with large armies.
+!!VRx2:Sx3:100;
+!!VRx2:*y11;
+!!VRx2::8;                              [Conservative Arena calibration: use one eighth of adjusted Hero Strength]
+!!VRx2&x3>0/x2<1:S1;
+
+
+!?FU(Arena_Get_Normal_Danger_Value);
+*x1 = Arena number, x2 = current Fight Value of all configured enemy stacks
+!!VRx2:S0;
+!!FU|x1<1/x1>15:E;
+!!re i/0/7;
+  !!VRy1:Si^Arena_%X1_Guards_Type_Slot_%i^;
+  !!VRy2:Si^Arena_%X1_Guards_Number_Slot_%i^;
+  !!FU(Arena_Apply_Normal_Guard_Difficulty):Px1/y2/?y2;
+  !!if&y1>=0/y2>0;
+    !!MA:Fy1/?y3;
+    !!VRy3:*y2;
+    !!VRx2:+y3;
+  !!en;
+!!en;
+
+
+!?FU(Arena_Get_Boss_Danger_Value);
+*x1 = Arena number, x2 = difficulty-scaled recommended Fight Value
+!!VRx2:S0;
+!!FU|x1<16/x1>30:E;
+!!VRx2:Si^Arena_%X1_Danger_Value^;
+!!SN:W^Arena_Boss_Difficulty^/?y1;
+!!VRy1|y1<1/y1>4:S2;                   [Use Warrior when no valid difficulty was selected]
+*Avoid percentage multiplication here: large boss values can overflow a signed
+*32-bit ERM variable before the following division is evaluated.
+!!VRy2:Sx2:2;                           [Half of the unmodified Normal value]
+!!VRx2&y1=1::2;                         [Easy: 50%]
+!!VRx2&y1=3:+y2;                        [Hard: 150%]
+!!VRx2&y1=4:*2;                         [Extreme: 200%]
+
+
+!?FU(Arena_Get_Danger_Text);
+*x1 = hero ID, x2 = Arena number, x3 = localized danger assessment
+!!FU(Arena_Get_Hero_Fight_Value):Px1/?y20;
+!!VRy21:S0;
+!!if&x2<=15;
+  !!FU(Arena_Get_Normal_Danger_Value):Px2/?y21;
+!!el;
+  !!FU(Arena_Get_Boss_Danger_Value):Px2/?y21;
+!!en;
+
+!!if&y21>0;
+  *Scale both values before multiplying to avoid a 32-bit overflow in very large armies.
+  !!VRy22:Sy20:100;
+  !!VRy23:Sy21:100;
+  !!VRy23&y23<1:S1;
+  !!VRy24:Sy22*100:y23;                 [Hero strength as percentage of the Arena estimate]
+
+  !!SN&y24>=200:T^AC_Arena.Danger_Low^/?z2;
+  !!SN&y24>=130/y24<200:T^AC_Arena.Danger_Moderate^/?z2;
+  !!SN&y24>=90/y24<130:T^AC_Arena.Danger_High^/?z2;
+  !!SN&y24>=60/y24<90:T^AC_Arena.Danger_Very_High^/?z2;
+  !!SN&y24<60:T^AC_Arena.Danger_Extreme^/?z2;
+  !!SN:T^AC_Arena.Danger_Assessment^/?z1/^danger^/z2;
+!!el;
+  !!SN:T^AC_Arena.Danger_Unavailable^/?z1;
+!!en;
+!!VRx3:Zz1;
+
+
+!?FU(Arena_Show_Entry_Danger);
+*x1 = hero ID, x2 = Arena number
+!!FU(Arena_Get_Hero_Fight_Value):Px1/?y20;
+!!VRy21:S0;
+!!if&x2<=15;
+  !!FU(Arena_Get_Normal_Danger_Value):Px2/?y21;
+!!el;
+  !!FU(Arena_Get_Boss_Danger_Value):Px2/?y21;
+!!en;
+!!FU&y21<=0:E;
+
+*Use the same overflow-safe ratio calculation as the menu assessment.
+!!VRy22:Sy20:100;
+!!VRy23:Sy21:100;
+!!VRy23&y23<1:S1;
+!!VRy24:Sy22*100:y23;
+!!FU(Arena_Get_Danger_Text):Px1/x2/?z1;
+!!SN:T^AC_Arena.Danger_Entry_Details^/?z2/^hero_strength^/y20/^arena_strength^/y21/^ratio^/y24/^assessment^/z1;
+!!IF:M^%Z2^;
 
 
 *When right clicking the arena description field, show creature hire dialogue with changed stats
@@ -1699,10 +2093,10 @@ Code by Daemon to forcely enable Health Bars for Arena Fights
 
 !!SN:W^Arena_Boss_Difficulty^/?y1; get difficulty
 
-*!IF:M^Now set stats^; Test
-!!VRy1:S2;
+!!VRy1&y1<1:S2;                         [Use Normal when no valid difficulty was selected]
+!!VRy1&y1>4:S2;
 
-!!re i/15/30;                           [loop all Boss Arenas]
+!!re i/16/30;                           [loop all Boss Arenas]
   *Attack
   !!SN:W^Arena_%i_Boss_Attack^/?y10;
   !!VRy10&y1=1:-10;
@@ -1718,23 +2112,23 @@ Code by Daemon to forcely enable Health Bars for Arena Fights
   !!VRy10&y1=2:+0;
   !!VRy10&y1=3:+10;
   !!VRy10&y1=4:+20;
-  !!VRy10:+y31+y32; Add scaling factor
+  !!VRy10:+y31+y32;                     [Add scaling factor]
   !!SN:W^Arena_%i_Boss_Defense_Scaled^/y10;
 
   *Damage
   !!SN:W^Arena_%i_Boss_Damage^/?y10;
-  !!VRy10&y1=1:-2000;
-  !!VRy10&y1=2:+0;
-  !!VRy10&y1=3:+2000;
-  !!VRy10&y1=4:+5000;
+  !!VRy10&y1=1:*50:100;
+  !!VRy10&y1=2:*100:100;
+  !!VRy10&y1=3:*150:100;
+  !!VRy10&y1=4:*200:100;
   !!SN:W^Arena_%i_Boss_Damage_Scaled^/y10;
 
   *Health
   !!SN:W^Arena_%i_Boss_Health^/?y10;
-  !!VRy10&y1=1:*3:2;
-  !!VRy10&y1=2:*2;
-  !!VRy10&y1=3:*3;
-  !!VRy10&y1=4:*4;
+  !!VRy10&y1=1::2;                      [50% of the established Warrior value]
+  !!VRy10&y1=2:*1;                      [100% Warrior baseline]
+  !!VRy10&y1=3:*3:2;                    [150% of Warrior baseline]
+  !!VRy10&y1=4:*2;                      [200% of Warrior baseline]
   !!SN:W^Arena_%i_Boss_Health_Scaled^/y10;
 
   *Speed
@@ -1742,7 +2136,7 @@ Code by Daemon to forcely enable Health Bars for Arena Fights
   !!VRy10&y1=1:-2;
   !!VRy10&y1=2:+0;
   !!VRy10&y1=3:+2;
-  !!VRy10&y1=4:+4;
+  !!VRy10&y1=4:+3;
   !!SN:W^Arena_%i_Boss_Speed_Scaled^/y10;
 !!en;
 
@@ -1759,34 +2153,28 @@ x1= Arena number
 !!VRy26:Si^Arena_%X1_Enrage_Timer^;
 !!VRy27:Si^Arena_%X1_Magic_Immune^;
 !!VRy28:Si^Arena_%X1_Custom_Growth_Start^;
+!!FU(Arena_Get_Effective_Growth_Start):Px1/y28/?y28;
 !!VRy29:Si^Arena_%X1_Custom_Growth_Linear^;      
 
 !!VRy30:Si^Arena_%X1_Guards_Type_Slot_0^;
 !!VRy30:+2;
-!!VRs^Arena_%X1_Description_right_click^:S^{~r}Arena %X1 {~>cprsmall.def:%Y30}{~}
+!!SN:T^AC_Arena.Right_Click_Header^/?z10/^arena^/x1/^creature_icon^/y30;
+!!SN:T^AC_Arena.Right_Click_Player^/?z11/^cost^/y20/^visits_player^/y21;
+!!SN:T^AC_Arena.Right_Click_Hero^/?z12/^visits_hero^/y22/^minimum_level^/y23/^maximum_level^/y24;
+!!SN:T^AC_Arena.Right_Click_Battle^/?z13/^maximum_duration^/y25/^enrage_timer^/y26/^magic_resistance^/y27;
+!!SN:T^AC_Arena.Right_Click_Arena^/?z14/^scaling_week^/y28/^units_per_week^/y29;
+!!VRs^Arena_%X1_Description_right_click^:S^%Z10
 
 
-{~r}Player{~}
-Arena cost: %Y20
-Visits per player: %Y21
+%Z11
 
-{~r}Hero{~}
-Visits per hero: %Y22
-Minimal hero level: %Y23
-Maximal hero level: %Y24
+%Z12
 
-{~r}Battle{~}
-Maximal battle duration: %Y25
-Enrage timer: %Y26
-Magic resistance: %Y27
+%Z13
 
-{~r}Arena{~}
-Scaling starts at week: %Y28
-Units added per week: %Y29
-^; 
+%Z14^;
 
 !!VRz9:Ss^Arena_%X1_Description_right_click^;    [Set text that will show in the description field]
-
 
 
 

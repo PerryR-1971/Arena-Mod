@@ -22,18 +22,15 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P6/?y80/?y81;
 
 !!VRs^Arena_6_CB_Name^:S^Arena 6^;
 !!VRs^Arena_6_Description^:S^{~r}Arena 6 {~>cprsmall.def:89}{~}
 
-Difficulty: {~blue}Medium{~}
-Cost: 5000{~>SMALRES.def:6}
-Reward: 50000{~>SMALRES.def:6} and 50000{~>ExpSmall.def:0}
-Min Level requirement: 20
-Max Level requirement: 40
-Description: an fight versus %Y10 Wolf Raiders.
-
-Specials: {~r}Enrage timer at battle round 3!{~}
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Challenge: Fight %Y10 Wolf Raiders.
+Rules: Hero levels 20-40; Enrage in round 3.
+Tip: Eliminate stacks quickly before the Enrage begins.
 ^; (Set the text that shows when you visit the CB)
 
 

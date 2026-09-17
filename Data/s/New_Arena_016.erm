@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P16/?y80/?y81;
 
 !!VRs^Arena_16_CB_Name^:S^{~>cprsmall.def:3}^;
 
@@ -26,10 +27,10 @@ Parameter Settings:
 {~>monprt44.def:3}{~>monprt44.def:3}{~>monprt44.def:3}{~>monprt44.def:3} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 25000{~>SMALRES.def:6} 50000{~>ExpSmall.def:0} +1 Attack, +100 damage to melee attacks, +15% commander damage
-Description: Your first boss encounter?.
-Specials: None^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +1 Attack, +100 melee damage, +15% Commander damage.
+Challenge: Four brothers grow stronger whenever one of them falls.
+Tip: Weaken them evenly before finishing them.^; 
 
 
 ******Battlefield********
@@ -61,6 +62,7 @@ Set the stats of the boss here
 !!VRi^Arena_16_Boss_Damage^:S2500;
 !!VRi^Arena_16_Boss_Health^:S15000;
 !!VRi^Arena_16_Boss_Speed^:S15;
+!!VRi^Arena_16_Danger_Value^:S1500000;     (Recommended army Fight Value on Warrior difficulty. Used by the danger assessment.)
 !!VRs^Arena_16_Boss_Name^:S^Castle Gryphonheart Guard^;
 !!VRs^Arena_16_Boss_Description^:S^50% chance for double damage
 Brotherly revenge
@@ -153,13 +155,11 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_16_BuffSpell_Power_1^/75;  [set spell power/effect of that spell, can have different meaning]
 !!SN:W^Arena_16_BuffSpell_ID_2^/28;     [set spell 2 ID which should be applied at battle start on stack 21]
 !!SN:W^Arena_16_BuffSpell_Power_2^/75;  [set spell power/effect of that spell, can have different meaning]
-
-27  Shield
-28  Air Shield 
-
-*!VRi^Arena_16_Cast_Spell_ID^:S15;      [Set to Inferno cast]
-*!VRi^Arena_16_Cast_Spells^:S2;         [Set amount of cast]
-*!SN:W^Arena_16_Cast_Spell_Damage^/5000; [Set the damage the spell should cause]
+*Alternate the two unique Halberdier appearances across all four Boss stacks.
+!!FU(Arena_Set_Boss_Battle_Def):P16/^ar16a.def^/21;
+!!FU(Arena_Set_Boss_Battle_Def):P16/^ar16b.def^/22;
+!!FU(Arena_Set_Boss_Battle_Def):P16/^ar16a.def^/23;
+!!FU(Arena_Set_Boss_Battle_Def):P16/^ar16b.def^/24;
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -200,28 +200,6 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!en;
 
 
-*The physical damage a raid boss can receive is never more than 33% of his max HP with one strike for physical damage
-Addon for the rest of the 4 Brothers
-!?MF1&i^Arena_Fight^;
-!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>16:E; [Exit if it is not Arena Fight]
-!!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
-
-!!UN:C42149568/4/?y10;                  [Physical Damage]
-!!if|y10=4462398/y10=4455011/y10=4456676;[Only run when melee or shooting damage]
-  !!BG:A?y3;
-    !!if|y3=6/y3=7;                     [If Melee or Range]
-    !!MF:N?y4;                          [damage receiving stack]
-    !!BG:N?y5;
-    !!BMy4:I?y7 H?y6;                   [Monster Side Index and max HP]
-    !!if|y4=22/y4=23/y4=24;                         [if any defender stack and defender side]
-      !!MF:F?y9;                        [get damage]
-      !!VRy6:*33:100;                   [get 33% of max HP of Raid Boss]
-      !!MF&y9>y6:Fy6;                   [Set damage to max 40%]
-    !!en;
-  !!en;
-!!en;
-
-
 *When any of the four brothers die, the others ones numbers raise by one :)
 !?FU(ACM_OnAfterMelee)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>16:E; [Exit if it is not Arena Fight]
@@ -251,9 +229,6 @@ Addon for the rest of the 4 Brothers
 
 !!BM24:N?y1;
 !!BM24&y1>0:Nd1 V50;
-
-*!VRz-9:S^Resurect.wav^;
-*!SN&i^battle_isVisible^:Pz-9;
 
 !!VRz-1:S^Lord_Xeen_Laugh.wav^;
 !!SN:Pz-1;                          [play laugh sound]

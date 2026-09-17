@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P23/?y80/?y81;
 
 !!VRs^Arena_23_CB_Name^:S^{~>cprsmall.def:67}^;
 
@@ -26,9 +27,10 @@ Parameter Settings:
 {~>monprt44.def:67} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 50000{~>SMALRES.def:6} and 250000{~>ExpSmall.def:0} +2 spell power, +10% spell damage, +100 damage vs living units
-Description: A powerfull Lich that summons an army of skeletons around him.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +2 Spell Power, +10% spell damage, +100 damage against living units.
+Challenge: Acts first with 50 Speed and alternates between summoning Skeletons and casting Death Ripple.
+Tip: Destroy the summoned Skeletons before they overwhelm you.^; 
 
 
 ******Battlefield********
@@ -58,9 +60,11 @@ Set the stats of the boss here
 !!VRi^Arena_23_Boss_Damage^:S7000;
 !!VRi^Arena_23_Boss_Health^:S75000;
 !!VRi^Arena_23_Boss_Speed^:S18;
+!!VRi^Arena_23_Danger_Value^:S5000000;     (Recommended army Fight Value on Warrior difficulty. Used by the danger assessment.)
 !!VRs^Arena_23_Boss_Name^:S^The Lich King^;
-!!VRs^Arena_23_Boss_Description^:S^Summons skeletons
-May cast Death Ripple
+!!VRs^Arena_23_Boss_Description^:S^Summons Skeletons every second combat round
+Casts Death Ripple during the alternating rounds
+50 Speed during the first combat round
 No Enemy Retaliation
 Magic Resistance 25%^;
 
@@ -109,7 +113,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_23_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_23_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_23_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_23_Reward_Gold^:S50000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_23_Reward_Gold^:S150000;            (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_23_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_23_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -118,7 +122,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_23_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_23_Reward_Experience^:S250000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_23_Reward_Experience^:S300000;       (The amount of Experience 1-9999999)
 
 !!VRi^Arena_23_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_23_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -145,55 +149,51 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!VRi^Arena_23_Custom_Sound^:S0;          (1=yes, 0=no, if activated you need to find the correct sound file of the object you want to replace, use the SN trigger for it. That is necessary so that it can be replaced and your custom file can be played.)
 !!VRs^Arena_23_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_23_Custom_Sound is set active)
 
-!!VRi^Arena_23_Extra_Shots^:S1;         [Set number of extra shots]
-
-!!SN:W^Arena_23_Resurrect_Value^/20000; [set the amount of HP a creature resurrects with in total HP]
+!!FU(Arena_Apply_Boss_Effect_Difficulty):P30000/?y90;
+!!SN:W^Arena_23_Resurrect_Value^/y90;   [set difficulty-scaled resurrection HP]
 !!SN:W^Arena_23_Resurrect_Times^/1;     [set the number of times a creature can resurrect]
+!!FU(Arena_Set_Boss_Battle_Def):P23/^ar23.def^; [custom appearance for the Lich King]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1;
 !!if&y1=23;    
   !!BM21:P95;                           [set new position]
-  !!SN:W^Arena_23_Once_Flag^/0;    
+  !!SN:W^Arena_23_Last_Ability_Round^/-1;
 !!en;
+
 
 !?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^;
 !#VA(stackSide:x) (stackInd:x);
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>23:E; [Exit if it is not Arena Fight]
 !!if&x1=1/x2=0;                         [if defender side]
-!!BM21:P?y71 E1;                        [get position of stack]
-!!FU(ACM_Generate_Random_Stack):P1/?y40;[return a random enemy stack to shoot]
-!!BMy40:P?y50;                          [get position of stack]
-!!SN:W^Arena_23_Once_Flag^/?y20;
-!!SS24:E3/?y30 P?y31;                   [temp save effect and power]
-!!SS24:E3/10000 P0;                     [temp set spell damage]
-!!BM21|v997=0/y20=1:C24/y50/3/3/1;      [cast Death Ripple in the First Battle Round or when he resurrected]
-!!SS24:E3/y30 Py31;                     [restore spell values]
-!!SN&y20=1:W^Arena_23_Once_Flag^/0;     [reset flag]
-  !!re i/0/5;                           [loop around the creatures in cirlce 0-6 positions]
-    !!FU(ACM_Calc_neighbouring_hex_2):Py71/i/?y70; [Pass position and return first neighbouring hex field]
-    !!FU(WOG_GetValidPositionForStack):Py70/57/1/?y72/0; [check if this position is free]
-    !!BU&y72>-1:S57/5000/y72/1/-1/1;    [Summon  57 Skeleton Warrior]
-  !!en;
+!!if&v997=0;
+  !!VRy2:Si^Arena_23_Boss_Speed_Scaled^;
+  !!BM21:Sy2;                            [restore normal Speed after the first turn has already been granted]
 !!en;
 
-*When any of the Raiders die, the Arena Boss gets a Buff
-*?FU(ACM_OnAfterMelee)&i^Arena_Fight^;
-*!SN:W^Arena_Challenge_Number^/?y1; *!FU&y1<>23:E; [Exit if it is not Arena Fight]
-*#VA(atkStack:x) (defStack:x);
-*!if&(defStack)=21;                     [if any defender stack]
-  *!BM(defStack):N?y10;                 [get stack numbers]
-  *!IF:L^After Shot Melee is %Y10^;
-  *!SN&y10=0:W^Arena_23_Once_Flag^/1;
-*!en;
+!!SN:W^Arena_23_Last_Ability_Round^/?y20;
+!!FU&y20=v997:E;                         [run the special ability only once per combat round]
+!!SN:W^Arena_23_Last_Ability_Round^/v997;
+!!VRy73:Sv997;
+!!VRy73:%2;                              [0 = summon, 1 = Death Ripple]
 
-*?FU(ACM_OnAfterShoot)&i^Arena_Fight^;
-*!SN:W^Arena_Challenge_Number^/?y1; *!FU&y1<>23:E; [Exit if it is not Arena Fight]
-*#VA(atkStack:x) (defStack:x);
-*!if&(defStack)=21;                     [if any defender stack]
-  *!BM(defStack):N?y10;                 [get stack numbers]
-  *!IF:L^After Shot Number is %Y10^;
-  *!SN&y10=0:W^Arena_23_Once_Flag^/1;
-*!en;
+!!if&y73=0;
+  !!BM21:P?y71 E1;                      [get Boss position]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P1000/?y90;
+  !!re i/0/5;                           [loop around the creatures in cirlce 0-6 positions]    
+    !!FU(Arena_Calc_neighbouring_hex):Py71/i/?y70; [Pass position and return first neighbouring hex field]        
+    !!FU(WOG_GetValidPositionForStack):Py70/57/1/?y72/2; [check if this position is free]    
+    !!BU&y72>=0/y72<=186:S57/y90/y72/1/-1/1;     [Summon difficulty-scaled Skeleton Warriors]
+  !!en;
+!!el;
+  !!FU(ACM_Generate_Random_Stack):P1/?y40;[return a random enemy stack]
+  !!BMy40:P?y50;                        [get target position]
+  !!SS24:E3/?y30 P?y31;                 [temporarily save spell effect and power]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+  !!SS24:E3/y90 P0;                     [set difficulty-scaled Death Ripple damage]
+  !!BM21:C24/y50/3/3/1;
+  !!SS24:E3/y30 Py31;                   [restore spell values]
+!!en;
+!!en;
 

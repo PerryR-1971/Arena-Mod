@@ -15,20 +15,17 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P14/?y80/?y81;
 !!VRy90:Si^Arena_14_Reward_1_Artifacts_Random^;
 
 !!VRs^Arena_14_CB_Name^:S^Arena 14^;
 !!VRs^Arena_14_Description^:S^{~r}Arena 14 {~>cprsmall.def:70} {~>cprsmall.def:66} {~>cprsmall.def:65} {~>cprsmall.def:64}{~}
 
-Difficulty: {~r}Hard{~}
-Cost: 10000{~>SMALRES.def:6}
-Reward: +2 to all primary stats +500 Santa Gremlins
-Min Level requirement: 40
-Max Level requirement: 60
-Description: Fight vs %Y10 undead creatures
-
-Specials: {~r}Enrage Timer 3{~}
-enemy creatures will get stronger after battleround 4!^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | +2 to all primary stats | 500 Santa Gremlins
+Challenge: Fight %Y10 mixed Undead creatures.
+Rules: Hero levels 40-60; Enrage in round 3.
+Tip: Use Destroy Undead or other anti-Undead effects.
+^; (Set the text that shows when you visit the CB)
 
 
 !?PI;
@@ -126,8 +123,6 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!VRi^Arena_14_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
 !!VRi^Arena_14_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_14_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
-
-
 
 
 

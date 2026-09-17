@@ -1,54 +1,101 @@
 {
-	"AC_Arena": {
-		
-		"Level_1_Description": 				"{~r}Arena 1{~}
-
-											Difficulty: {~green}Easy{~}
-											Cost: 2000 {~>SMALRES.def:6}
-											Reward: random minor artifact
-											Enrage timer: 5 combat rounds
-											Tactics: none
-											Description: an easy fight versus level 1 creatures.",
-																						
-		"Level_1_Short_Text": 				"Level 1 challenge
-											 Difficulty: Easy
-											 Cost: 2000 {~>SMALRES.def:6} 
-											 Reward: random artifact",
-											 
-		"Name_Town_Button": 				"Arena",
-		
-		"Name_Town_Button_Desc": 			"Arena of Life and Death.
-											Fight certain challenges for rewards.",
-											
-		"Left_Button": 						"Fight",
-		
-		"Right_Button": 					"Exit",
-		
-		"Header_Text": 						"{~r}Welcome to the Arena of Life and Death{~}
-											Remember, you are only allowed one arena combat per visit. To fight an arena battle, select the option that best describes your abilities and return to me- if you survive...",
-
-		"Exit_Condition_1": 				"You don't have enough gold to fight in this arena",
-		"Exit_Condition_2": 				"You have already fought this week. Come back later",
-		"Exit_Condition_3": 				"You don't have enough experience to fight in this arena",
-		"Exit_Condition_4": 				"You have to much experience to fight in this arena",
-		"Exit_Condition_5": 				"Daemon told me you are not allowed to visit this arena",
-		"Exit_Condition_6": 				"You have already fighted in this arena, try another challenge",
-		"Exit_Condition_7": 				"This Bossbattle Arena can only be visited when the Advanced Classes Mod is active.",
-
-		"Hint_1": 							"Arena",
-		"Hint_2": 							"The Arena Master",
-		"Hint_3": 							"The Arena (right click for more info)",
-		"Hint_4": 							"Switch pages",
-		"Hint_5": 							"Start the fight",
-		"Hint_6": 							"Exit the arena",
-
-		"diff_header": 						"Select Arena Boss Difficulty\nRight-click system options to call settings again",
-		"diff_level1": 						"Easy - 75% stats scaling.",
-		"diff_level2": 						"Normal - 100% stats scaling.",
-		"diff_level3": 						"Hard - 150% stats scaling.",
-		"diff_level4": 						"Extreme - 200% stats scaling."			
-		
-	},
-
+  "AC_Arena": {
+    "Level_1_Description": "{~r}Arena 1{~}\n\n\t\t\t\t\t\t\t\t\t\t\tDifficulty: {~green}Easy{~}\n\t\t\t\t\t\t\t\t\t\t\tCost: 2000 {~>SMALRES.def:6}\n\t\t\t\t\t\t\t\t\t\t\tReward: random minor artifact\n\t\t\t\t\t\t\t\t\t\t\tEnrage timer: 5 combat rounds\n\t\t\t\t\t\t\t\t\t\t\tTactics: none\n\t\t\t\t\t\t\t\t\t\t\tDescription: An easy fight versus level 1 creatures.",
+    "Level_1_Short_Text": "Level 1 challenge\n\t\t\t\t\t\t\t\t\t\t\t Difficulty: Easy\n\t\t\t\t\t\t\t\t\t\t\t Cost: 2000 {~>SMALRES.def:6} \n\t\t\t\t\t\t\t\t\t\t\t Reward: random artifact",
+    "Name_Town_Button": "Arena",
+    "Name_Town_Button_Desc": "Arena of Life and Death.\n\t\t\t\t\t\t\t\t\t\t\tFight certain challenges for rewards.",
+    "Left_Button": "Fight",
+    "Right_Button": "Exit",
+    "Header_Text": "{~r}Welcome to the Arena of Life and Death{~}\n\t\t\t\t\t\t\t\t\t\t\tRemember, you are only allowed one arena combat per visit. To fight an arena battle, select the option that best describes your abilities and return to me if you survive...",
+    "Rules_Text": "{~Yellow}Rules of the Arena of Life and Death{~}\n\n{~LimeGreen}Standard Arenas 1-15{~} - @standard_difficulty@\n- Enemy numbers and configured growth depend on the difficulty.\n- Each Arena has individual level limits, combat rules and rewards.\n\n{~Red}Boss Arenas 16-30{~} - @boss_difficulty@\n- Boss stats, damage and scripted effects depend on the difficulty.\n- Boss Arenas require the Advanced Classes Mod.\n\n{~Yellow}General Rules{~}\n- Your army, Commander and Henchman are restored after every battle.\n- Entry costs 200 movement points plus the configured gold fee; visit restrictions apply.\n- Right-click an Arena for details or a Boss in combat to inspect its stats.",
+    "Difficulty_Overview": "{~Yellow}Current Arena Difficulties{~}\n\n{~LimeGreen}Standard Arenas 1-15:{~} @standard_difficulty@\n{~Red}Boss Arenas 16-30:{~} @boss_difficulty@\n\nRight-click the System Options icon on the Adventure Map to change these settings.",
+    "Menu_Easy": "Easy",
+    "Menu_Medium": "Medium",
+    "Menu_Hard": "Hard",
+    "Menu_Boss_Battle": "Boss Battle",
+    "Menu_Page": "Page: @page@",
+    "Battle_Lost": "The win condition has not been fulfilled.\n\n{~r}You lose!{~}",
+    "Battle_Enrage": "{~r}The creatures are getting enraged and have their stats increased!{~}",
+    "Boss_Phase_2_Message": "{~Red}Phase 2 activated for @boss@!{~}",
+    "Air_Dodge": "{You dodge the damage.}",
+    "Right_Click_Header": "{~r}Arena @arena@ {~>cprsmall.def:@creature_icon@}{~}",
+    "Right_Click_Player": "{~r}Player{~}\nArena cost: @cost@\nVisits per player: @visits_player@",
+    "Right_Click_Hero": "{~r}Hero{~}\nVisits per hero: @visits_hero@\nMinimum hero level: @minimum_level@\nMaximum hero level: @maximum_level@",
+    "Right_Click_Battle": "{~r}Battle{~}\nMaximum battle duration: @maximum_duration@\nEnrage timer: @enrage_timer@\nMagic resistance: @magic_resistance@",
+    "Right_Click_Arena": "{~r}Arena{~}\nScaling starts at week: @scaling_week@\nUnits added per week: @units_per_week@",
+    "Danger_Assessment": "Danger for the current army: @danger@",
+    "Danger_Low": "{~LimeGreen}Low{~}",
+    "Danger_Moderate": "{~Green}Moderate{~}",
+    "Danger_High": "{~Yellow}High{~}",
+    "Danger_Very_High": "{~Orange}Very high{~}",
+    "Danger_Extreme": "{~Red}Extreme{~}",
+    "Danger_Unavailable": "Danger for the current army: unavailable",
+    "Danger_Entry_Details": "{~Yellow}Arena danger assessment{~}\n\nHero strength: {@hero_strength@}\nArena benchmark: {@arena_strength@}\nRelative strength: {@ratio@%}\n\n@assessment@\n\nThis estimate compares army Fight Value and broad hero statistics. Scripted Boss abilities can only be approximated.",
+    "Exit_Condition_1": "You don't have enough gold to fight in this arena",
+    "Exit_Condition_2": "You have already fought this week. Come back later",
+    "Exit_Condition_3": "You don't have enough experience to fight in this arena",
+    "Exit_Condition_4": "You have too much experience to fight in this arena",
+    "Exit_Condition_5": "Daemon told me you are not allowed to visit this arena",
+    "Exit_Condition_6": "You have already fought in this arena; try another challenge",
+    "Exit_Condition_7": "This Boss Battle arena can only be visited when the Advanced Classes Mod is active.",
+    "Hint_1": "Arena @arena@",
+    "Hint_2": "The Arena Master (right-click for current difficulty)",
+    "Hint_3": "Arena rules (right-click for more information)",
+    "Hint_4": "Switch pages",
+    "Hint_5": "Start the fight",
+    "Hint_6": "Exit the arena",
+    "diff_header": "Select Arena Boss Difficulty\nRight-click system options to call settings again",
+    "diff_level1": "Easy - 75% stats scaling.",
+    "diff_level2": "Normal - 100% stats scaling.",
+    "diff_level3": "Hard - 150% stats scaling.",
+    "diff_level4": "Extreme - 200% stats scaling."
+  },
+  "Arena_Config": {
+    "Title": "Arena Master",
+    "Description": "Welcome to the Arena of Life and Death.\nChoose the rank that best describes your abilities.",
+    "Standard_Tab": "Standard Arenas",
+    "Boss_Tab": "Boss Arenas",
+    "Standard_Tab_Selected": "{~Yellow}Standard Arenas{~}",
+    "Boss_Tab_Selected": "{~Yellow}Boss Arenas{~}",
+    "Standard_Tab_Hint": "Configure the difficulty rank for Standard Arenas 1-15",
+    "Boss_Tab_Hint": "Configure the difficulty rank for Boss Arenas 16-30",
+    "Standard_Description": "Configure Standard Arenas 1-15.\nChoose the rank that best describes your abilities.",
+    "Boss_Description": "Configure Boss Arenas 16-30.\nChoose the rank that best describes your abilities.",
+    "Peasant": "Peasant - 75% stats scaling",
+    "Warrior": "Warrior - 100% stats scaling",
+    "Berserk": "Berserk - 150% stats scaling",
+    "Chieftain": "Chieftain - 200% stats scaling",
+    "Peasant_Label": "Peasant",
+    "Warrior_Label": "Warrior",
+    "Berserk_Label": "Berserk",
+    "Chieftain_Label": "Chieftain",
+    "Peasant_Selected": "{~Yellow}Peasant{~}",
+    "Warrior_Selected": "{~Yellow}Warrior{~}",
+    "Berserk_Selected": "{~Yellow}Berserk{~}",
+    "Chieftain_Selected": "{~Yellow}Chieftain{~}",
+    "Current_Standard": "Standard Arenas rank: @difficulty@",
+    "Current_Boss": "Boss Arenas rank: @difficulty@",
+    "Standard_Peasant_Info": "{Peasant}\n\n50% enemy numbers. Arena scaling begins two weeks later.",
+    "Standard_Warrior_Info": "{Warrior}\n\n100% enemy numbers. Arena scaling begins at the configured week.",
+    "Standard_Berserk_Info": "{Berserk}\n\n150% enemy numbers. Arena scaling begins one week earlier.",
+    "Standard_Chieftain_Info": "{Chieftain}\n\n200% enemy numbers. Arena scaling begins two weeks earlier.",
+    "Peasant_Info": "{Peasant}\n\n50% Boss health and damage, -10 Attack and Defense, -2 Speed.",
+    "Warrior_Info": "{Warrior}\n\n100% Boss health and damage. Attack, Defense and Speed remain unchanged.",
+    "Berserk_Info": "{Berserk}\n\n150% Boss health and damage, +10 Attack and Defense, +2 Speed.",
+    "Chieftain_Info": "{Chieftain}\n\n200% Boss health and damage, +20 Attack and Defense, +3 Speed.",
+    "Peasant_Hint": "Peasant: 50% Boss health and damage, -10 Attack and Defense, -2 Speed.",
+    "Warrior_Hint": "Warrior: Standard Boss health, damage, Attack, Defense and Speed.",
+    "Berserk_Hint": "Berserk: 150% Boss health and damage, +10 Attack and Defense, +2 Speed.",
+    "Chieftain_Hint": "Chieftain: 200% Boss health and damage, +20 Attack and Defense, +3 Speed.",
+    "Current_Hint": "The selected rank is saved after confirmation.",
+    "Standard_Peasant_Hint": "Peasant: 50% enemy numbers; scaling begins two weeks later.",
+    "Standard_Warrior_Hint": "Warrior: 100% enemy numbers; original scaling start.",
+    "Standard_Berserk_Hint": "Berserk: 150% enemy numbers; scaling begins one week earlier.",
+    "Standard_Chieftain_Hint": "Chieftain: 200% enemy numbers; scaling begins two weeks earlier.",
+    "Standard_Current_Hint": "The selected Standard Arena rank is saved after confirmation.",
+    "Confirm_Button": "Confirm",
+    "Cancel_Button": "Exit",
+    "Confirm_Hint": "Save the selected rank",
+    "Cancel_Hint": "Discard changes and exit"
+  }
 }
-

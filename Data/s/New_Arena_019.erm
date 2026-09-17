@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P19/?y80/?y81;
 
 !!VRs^Arena_19_CB_Name^:S^{~>cprsmall.def:89}^;
 
@@ -26,10 +27,10 @@ Parameter Settings:
 {~>monprt44.def:89} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 75000{~>SMALRES.def:6} and 75000{~>ExpSmall.def:0} +1 Spell Power, +5 Magic Strengh, +20% commander spell modifier
-Description: A strong Goblin Raider who can call other Goblins for help.
-Tipp: When you kill the leader the rest of the pack will surrender.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +1 Spell Power, +5 Magic Strength, +20% Commander spell modifier.
+Challenge: The Goblin Lord continuously calls reinforcements.
+Tip: Kill the leader to make the remaining pack surrender.^; 
 
 
 ******Battlefield********
@@ -61,6 +62,7 @@ Set the stats of the boss here
 !!VRi^Arena_19_Boss_Damage^:S10000;
 !!VRi^Arena_19_Boss_Health^:S40000;
 !!VRi^Arena_19_Boss_Speed^:S17;
+!!VRi^Arena_19_Danger_Value^:S3000000;     (Recommended army Fight Value on Warrior difficulty. Used by the danger assessment.)
 !!VRs^Arena_19_Boss_Name^:S^Grognard the Goblin Leader^;
 !!VRs^Arena_19_Boss_Description^:S^Calls more Goblins for help
 50% damage reduction in the first battle round 
@@ -115,7 +117,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_19_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_19_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_19_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_19_Reward_Gold^:S75000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_19_Reward_Gold^:S62500;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_19_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_19_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -124,7 +126,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_19_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_19_Reward_Experience^:S75000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_19_Reward_Experience^:S125000;      (The amount of Experience 1-9999999)
 
 !!VRi^Arena_19_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_19_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -158,13 +160,13 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_19_BuffSpell_ID_2^/43;     [set spell 1 ID which should be applied at battle start on stack 21]
 !!SN:W^Arena_19_BuffSpell_Power_2^/10;  [set spell power/effect of that spell, can have different meaning]
 43  Bloodlust 
+!!FU(Arena_Set_Boss_Battle_Def):P19/^ar19.def^; [custom appearance for the Goblin Leader]
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1;
 !!if&y1=19;
   !!BM21:P99;                           [set new position]
 !!en;
-
 
 *Summoner, in the second battle round calls a pack of Raiders to the battlefield
 *?BA0&i^Arena_Fight^;
@@ -174,6 +176,7 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 *!SN:W^Arena_Challenge_Number^/?y1; *!FU&y1<>19:E; [Exit if it is not Arena Fight]
 *!SN:W^Arena_Boss_Summoner_Round^/-1;    [Set flag to current battle round]
 
+Summon in Battle Round 1
 !?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^/v997=1;
 !#VA(stackSide:x) (stackInd:x);
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>19:E; [Exit if it is not Arena Fight]
@@ -187,6 +190,7 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!VRy61:S1000;
 !!FU(Arena_Boss_CheckIfPossibleToSummon):Py3/?y21; 
 !!FU&y21=0:E;
+!!FU(Arena_Apply_Boss_Effect_Difficulty):Py61/?y61;
 !!re i/0/17;
   !!VRy70:S0R185;
   !!FU(WOG_GetValidPositionForStack):Py70/86/1/?y71/2; [by wessonsm & Archer30]
@@ -196,7 +200,7 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
       !!VRz-1:S^Lord_Xeen_Laugh.wav^;
       !!SN:Pz-1;                          [play laugh sound]
     !!en;
-    !!BU:S86/y61/y71/1/0/0;             [Summon elementals at a random position]
+    !!BU:S86/y61/y71/1/0/0;             [Summon difficulty-scaled Raiders at a random position]
     *!FU(Arena_Boss_Set_Summon_Stats):Py71;
   !!en;
 !!en;   
@@ -218,7 +222,7 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!en;
 
 
-*When any of the Raiders die, the Arena Boss gets a Buff
+*When any of the Raiders die, the Arena Boss gets a Buff, except when you kill unit 21, then the fight ends.
 !?FU(ACM_OnAfterMelee)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>19:E; [Exit if it is not Arena Fight]
 !#VA(atkStack:x) (defStack:x);
@@ -242,7 +246,11 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !?FU(Arena_Boss_Increase_Stacks_19);
 !!BM21:N?y1;                            [get stack number]
 !!if&y1>0;                              [if still alive]
-!!BM21&y1>0:Ad5 Ld-2000 V17;            [Increase attack by 5 an restore 1000 Health and play Frenzy animation]
+!!FU(Arena_Apply_Boss_Effect_Difficulty):P4000/?y90;
+!!BM21:L?y91;
+!!VRy91:-y90;
+!!VRy91&y91<0:S0;
+!!BM21&y1>0:Ad5 Ly91 V17;               [Increase attack and restore difficulty-scaled Health]
 !!VRz-9:S^BLOODLUS^;                    [17  Frenzy]
 !!SN&i^battle_isVisible^:Pz-9;          [play sound]
 !!VRz1:S^The {The Wolf Raider Leader} strengthens^; [set battle log]

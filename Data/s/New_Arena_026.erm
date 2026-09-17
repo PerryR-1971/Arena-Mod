@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P26/?y80/?y81;
 
 !!VRs^Arena_26_CB_Name^:S^{~>cprsmall.def:25}^;
 
@@ -26,10 +27,10 @@ Parameter Settings:
 {~>monprt44.def:25}{~>monprt44.def:25}{~>monprt44.def:25} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 50000{~>SMALRES.def:6} and 250000{~>ExpSmall.def:0} +2 attack, +10% Luck damage, +1% chance to trigger Luck
-Description: Three wooden brothers. Beware of their permanent root attack.
-Tipp: Try to avoid loosing your power stack.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +2 Attack, +10% Luck Damage, +1% chance to trigger Luck.
+Challenge: Three Dendroids act twice and permanently bind their targets.
+Tip: Protect your strongest stack from their root attacks.^; 
 
 
 ******Battlefield********
@@ -60,11 +61,13 @@ Set the stats of the boss here
 !!VRi^Arena_26_Boss_Damage^:S5000;
 !!VRi^Arena_26_Boss_Health^:S25000;
 !!VRi^Arena_26_Boss_Speed^:S17;
+!!VRi^Arena_26_Danger_Value^:S8000000;     (Base progression 7000000 + 1000000 for a particularly strong Arena.)
 !!VRs^Arena_26_Boss_Name^:S^The three Dendroid Soldiers^;
 !!VRs^Arena_26_Boss_Description^:S^Perma root
 One additional turn per round
 No Enemy Retaliation
-Magic Resistance 30%^;
+Magic Resistance 30%
+Phase 2 at 50% health: +30% stats and Stone Skin^;
 
 ******Guards********
 Set the guards and the number of each slot.
@@ -111,7 +114,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_26_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_26_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_26_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_26_Reward_Gold^:S50000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_26_Reward_Gold^:S300000;            (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_26_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_26_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -120,7 +123,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_26_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_26_Reward_Experience^:S250000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_26_Reward_Experience^:S600000;       (The amount of Experience 1-9999999)
 
 !!VRi^Arena_26_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_26_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -133,21 +136,28 @@ Random Creatures can also be generated in a certain range x1-x2 and faction, for
 Random Artifacts can also be generated in a certain range x1-x2. If you want to use this option go to the reward section Line ~409 and enable the code. Certain artifacts like blank WoG artifacts or combination artifacts are banned by default and must be enabled by the modder. 
 At the end of the mod search for Check_Forbidden_Artifacts and remove the code to enable the artifacts or add new IDs.
 
-!!VRi^Arena_26_Reward_PrimSkill^:S0;        (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random, 5-all)
-!!VRi^Arena_26_Reward_PrimSkill_Amount^:S2; (1-99)
+!!VRi^Arena_26_Reward_PrimSkill^:S0;    [(0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random, 5-all)]
+!!VRi^Arena_26_Reward_PrimSkill_Amount^:S2; [(1-99)]
 
-!!VRi^Arena_26_Reward_Spell_Points^:S-1;     (0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random)
-!!VRi^Arena_26_Reward_Spell^:S-1;            (-1=disabled, 0-69 Spell ID, 70=Random, 71=Random LvL1, 72=Random LvL2, 73=Random LvL3, 74=Random LvL4, 75=Random LvL5)
+!!VRi^Arena_26_Reward_Spell_Points^:S-1;[(0-Attack, 1-Defense, 2-Power Skill, 3-Knowledge, 4-random)]
+!!VRi^Arena_26_Reward_Spell^:S-1;       [(-1=disabled, 0-69 Spell ID, 70=Random, 71=Random LvL1, 72=Random LvL2, 73=Random LvL3, 74=Random LvL4, 75=Random LvL5)]
 
-!!VRi^Arena_26_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
-!!VRi^Arena_26_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_26_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
+!!VRi^Arena_26_Reward_Scales^:S0;       [(0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)]
+!!VRi^Arena_26_Reward_Scales_with_size^:S0; [(1=yes, 0=no, Requires Arena_26_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)]
 
 ;(To exclude certain artifacts to appear as reward go to func: (Arena_26_Check_Forbidden_Artifacts))
 
-!!VRi^Arena_26_Custom_Sound^:S0;          (1=yes, 0=no, if activated you need to find the correct sound file of the object you want to replace, use the SN trigger for it. That is necessary so that it can be replaced and your custom file can be played.)
-!!VRs^Arena_26_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_26_Custom_Sound is set active)
+!!VRi^Arena_26_Custom_Sound^:S0;        [(1=yes, 0=no, if activated you need to find the correct sound file of the object you want to replace, use the SN trigger for it. That is necessary so that it can be replaced and your custom file can be played.)]
+!!VRs^Arena_26_CB_Sound^:S^ROGUE.wav^;  [(Set the name of the sound file that should be played when visiting the object, only works when Arena_26_Custom_Sound is set active)]
 
 !!VRi^Arena_26_Act_Twice^:S1;           [Set amount of actings per round]
+
+!!SN:W^Arena_26_Phase_2_HP_Percent^/50; [Activate phase 2 at 50% health]
+!!SN:W^Arena_26_Phase_2_All_Stats_Percent^/130; [Increase current combat stats to 130%]
+!!SN:W^Arena_26_Phase_2_Spell_ID^/46;   [Stone Skin]
+!!FU(Arena_Set_Boss_Battle_Def):P26/^ar26a.def^/21;
+!!FU(Arena_Set_Boss_Battle_Def):P26/^ar26b.def^/22;
+!!FU(Arena_Set_Boss_Battle_Def):P26/^ar26c.def^/23;
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -177,7 +187,8 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!if&x1=1/y1>0/y11>0;                   [if defender side]
   !!SS23:E3/?y30 P?y31;                 [temp save effect and power]
-  !!SS23:E3/5000 P0;                    [temp set spell damage]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P5000/?y90;
+  !!SS23:E3/y90 P0;                     [temp set difficulty-scaled spell damage]
   !!BMi^battle_current_stack^:C23/y11/3/3/0; [Get type and side of current battlestack]
   !!SS23:E3/y30 Py31;                   [temp save effect and power]
 !!en;

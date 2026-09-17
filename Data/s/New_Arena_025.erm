@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P25/?y80/?y81;
 
 !!VRs^Arena_25_CB_Name^:S^{~>cprsmall.def:197}^;
 
@@ -26,11 +27,10 @@ Parameter Settings:
 {~>monprt44.def:197} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 50000{~>SMALRES.def:6} and 250000{~>ExpSmall.def:0} +4 knowledge, +5% to all commander stats, +100 fire damage to attacks
-
-Description: This dangerous horse will try to burn you. Avoid the Fire Walls, since they do huge damage.
-Tipp: Use Fire Resistance^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +4 Knowledge, +5% to all Commander stats, +100 fire damage to attacks.
+Challenge: Acts twice and surrounds the battlefield with damaging Fire Walls.
+Tip: Use Fire Resistance and avoid standing near multiple walls.^; 
 
 
 ******Battlefield********
@@ -61,6 +61,7 @@ Set the stats of the boss here
 !!VRi^Arena_25_Boss_Damage^:S10000;
 !!VRi^Arena_25_Boss_Health^:S75000;
 !!VRi^Arena_25_Boss_Speed^:S18;
+!!VRi^Arena_25_Danger_Value^:S7000000;     (Base progression 6000000 + 1000000 for a particularly strong Arena.)
 !!VRs^Arena_25_Boss_Name^:S^The Hell Steed^;
 !!VRs^Arena_25_Boss_Description^:S^Extended Firewall attack
 Acts twice
@@ -112,7 +113,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_25_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_25_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_25_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_25_Reward_Gold^:S50000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_25_Reward_Gold^:S250000;            (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_25_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_25_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -121,7 +122,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_25_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_25_Reward_Experience^:S250000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_25_Reward_Experience^:S500000;       (The amount of Experience 1-9999999)
 
 !!VRi^Arena_25_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_25_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -171,7 +172,8 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>25:E; [Exit if it is not Arena Fight]
 !!if&x1=1/x2=0;                         [if defender side]
   !!SS13:E3/?y30 P?y31;                 [temp save effect and power]
-  !!SS13:E3/10000 P0;                   [temp set spell damage]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+  !!SS13:E3/y90 P0;                     [temp set difficulty-scaled spell damage]
   !!re i/0/1;
     !!FU(ACM_Generate_Random_Stack):P1/?y40; [return a random enemy stack to shoot]
     !!BMy40:P?y50;                      [get position of stack]
@@ -183,4 +185,3 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
   !!BM21|v997=0/v997=2/v997=4/v997=6:C13/173/3/3/0; [cast Fire Wall in the First Battle Round]
   !!SS13:E3/y30 Py31;                   [temp set spell damage]
 !!en;
-

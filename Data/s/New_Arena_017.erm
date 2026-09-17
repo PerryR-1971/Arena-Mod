@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P17/?y80/?y81;
 
 !!VRs^Arena_17_CB_Name^:S^{~>cprsmall.def:4}^;
 
@@ -26,9 +27,10 @@ Parameter Settings:
 {~>monprt44.def:4} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 25000{~>SMALRES.def:6} 50000{~>ExpSmall.def:0} +1 Attack, +100 damage to range attacks, +15% commander attack
-Description: A dangerous range enemy with multishot. Hiding behind some trees you will either need to block him, or have a lot of range damage.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +1 Attack, +100 ranged damage, +15% Commander Attack.
+Challenge: A multishot archer who may act twice when engaged in melee.
+Tip: Engaging him blocks his ranged attacks, but may provoke an extra action.^; 
 
 
 ******Battlefield********
@@ -60,9 +62,11 @@ Set the stats of the boss here
 !!VRi^Arena_17_Boss_Damage^:S5000;
 !!VRi^Arena_17_Boss_Health^:S40000;
 !!VRi^Arena_17_Boss_Speed^:S15;
+!!VRi^Arena_17_Danger_Value^:S2000000;     (Recommended army Fight Value on Warrior difficulty. Used by the danger assessment.)
 !!VRs^Arena_17_Boss_Name^:S^Elite Archer^;
 !!VRs^Arena_17_Boss_Description^:S^Multi Rangeattack
 Fierce Melee Attack
+20% chance to act twice while engaged in melee
 50% Air Shielded
 No Enemy Retaliation
 Magic Resistance 25%^;
@@ -113,7 +117,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_17_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_17_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_17_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_17_Reward_Gold^:S25000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_17_Reward_Gold^:S37500;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_17_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_17_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -122,7 +126,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_17_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_17_Reward_Experience^:S50000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_17_Reward_Experience^:S75000;       (The amount of Experience 1-9999999)
 
 !!VRi^Arena_17_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_17_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -150,9 +154,11 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!VRs^Arena_17_CB_Sound^:S^ROGUE.wav^;  [(Set the name of the sound file that should be played when visiting the object, only works when Arena_17_Custom_Sound is set active)]
 
 !!SN:W^Arena_17_Random_Shots^/5;        [Set number of random multishots]
+!!SN:W^Arena_17_Act_Twice^/0;           [Enabled dynamically with a 20% chance while engaged in melee]
 
 !!SN:W^Arena_17_BuffSpell_ID_1^/28;     [set spell 1 ID which should be applied at battle start on stack 21]
 !!SN:W^Arena_17_BuffSpell_Power_1^/50;  [set spell power/effect of that spell, can have different meaning]
+!!FU(Arena_Set_Boss_Battle_Def):P17/^ar17.def^; [custom appearance for the Elite Archer]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -173,7 +179,8 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!if&x1>=21/x1<=41/x7=0;                [if any valid battlestack and melee]
     !!if&x2>=0/x2<=20;                  [if any valid battlestack]
-      !!VRx4:+10000;                    [+10000 damage with melee attack]
+      !!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+      !!VRx4:+y90;                      [difficulty-scaled fierce melee damage]
     !!en;
 !!en;
 
@@ -181,11 +188,19 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^;
 !#VA(stackSide:x) (stackInd:x);
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>17:E; [Exit if it is not Arena Fight]
+!!if&x1=1/x2=0;                         [original Elite Archer stack]
+  !!SN:W^Arena_17_Act_Twice^/0;
+  !!BM21:T?y10 N?y11 P?y70;
+  !!FU(Arena_Boss_Has_Adjacent_Enemy)&y10>=0/y11>0:Py70/?y72;
+  !!VRy73:S0R100;
+  !!SN&y72=1/y73<20:W^Arena_17_Act_Twice^/1;
+!!en;
+
 !!if&x1=1;                         [if defender side]
 
   !!SS13:E3/?y30 P?y31;                 [temp save effect and power]
-  !!SS13:E3/6000 P0;                   [temp set spell damage]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P6000/?y90;
+  !!SS13:E3/y90 P0;                     [temp set difficulty-scaled spell damage]
   !!BM21|v997=1/v997=5/v997=9:C13/117/3/3/0; [cast Fire Wall in the First Battle Round]
   !!SS13:E3/y30 Py31;                   [temp set spell damage]
 !!en;
-

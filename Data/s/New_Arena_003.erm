@@ -22,15 +22,16 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P3/?y80/?y81;
 !!VRy90:Si^Arena_3_Reward_1_Artifacts_Random^;
 
 !!VRs^Arena_3_CB_Name^:S^Arena 3^;
 !!VRs^Arena_3_Description^:S^{~r}Arena 3 {~>cprsmall.def:46}{~>cprsmall.def:47}{~}
 
-Difficulty: {~green}Easy{~}
-Reward: 20000{~>SMALRES.def:6} and a minor artifact.
-
-A fight versus %Y10 Gogs and Magogs. Clear before hero level 35. Creatures start growing after 2 months, so dont wait to long.
+Reward: %Y80{~>SMALRES.def:6} | Minor artifact
+Challenge: Fight %Y10 Gogs and Magogs.
+Rules: Maximum hero level 35.
+Tip: Spread your army to reduce Magog area damage.
 ^; (Set the text that shows when you visit the CB)
 
 

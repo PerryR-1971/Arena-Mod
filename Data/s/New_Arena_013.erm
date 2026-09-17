@@ -15,19 +15,17 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P13/?y80/?y81;
 !!VRy90:Si^Arena_13_Reward_1_Artifacts_Random^;
 
 !!VRs^Arena_13_CB_Name^:S^Arena 13^;
 !!VRs^Arena_13_Description^:S^{~r}Arena 13 {~>cprsmall.def:8} {~>cprsmall.def:9}{~}
 
-Difficulty: {~r}Hard{~}
-Cost: 10000{~>SMALRES.def:6}
-Reward: 20 level 7 creatures (make sure you have space)
-Min Level requirement: 35
-Max Level requirement: 60
-Description: Fight vs %Y10 Swordsman and Crusaders
-
-Specials: Win fight in {~r}5{~} rounds! Carefull they have 50 percent Magic Resistance!^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | 20 Halberdiers
+Challenge: Fight %Y10 Swordsmen and Crusaders.
+Rules: Hero levels 35-60; 50% Magic Resistance; Enrage in round 5.
+Tip: Prepare for strong melee attacks and double strikes.
+^; (Set the text that shows when you visit the CB)
 
 
 !?PI;
@@ -125,8 +123,6 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!VRi^Arena_13_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
 !!VRi^Arena_13_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_13_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
-
-
 
 
 

@@ -6,24 +6,100 @@ SN:W^Arena_%Y1_Regeneration_Value^/0; Regeneration in percent of HP per turn
 SN:W^Arena_%Y1_Cast_Spells^/0; Number of casts on target before any attack
 SN:W^Arena_%Y1_Cast_Spell_ID^/0; Spell ID that should be cast
 SN:W^Arena_%Y1_Cast_Spell_Damage^/0; Set the damage the spell should cause
-SN:W^Arena_%Y1_Extra_Shots^/0; Number of extra strikes
-SN:W^Arena_%Y1_Extra_Melee^/0; Number of extra shots
+SN:W^Arena_%Y1_Extra_Shots^/0; Number of extra shots
+SN:W^Arena_%Y1_Extra_Melee^/0; Number of extra strikes
 SN:W^Arena_%Y1_Additional_Melee^/0; Number of additional strikes on a random target
 SN:W^Arena_%Y1_Random_Shots^/0; Number of additional shots on a random target
 SN:W^Arena_%Y1_Act_Twice^/0; Number of actings per round
 SN:W^Arena_%Y1_AOE_Damage_Value^/0;   [set percent as AOE damage]
 SN:W^Arena_%Y1_Resurrect_Value^/0; set the amount of HP a creature resurrects with in total HP
 SN:W^Arena_%Y1_Resurrect_Times^/0; set the number of times a creature can resurrect
+SN:W^Arena_%Y1_Resurrect_Speed_Bonus^/0; Speed gained after every successful resurrection
+SN:W^Arena_%Y1_Act_Twice_After_Resurrection^/0; Number of resurrections required to enable Act Twice
 SN:W^Arena_%Y1_Dodge_Value^/0; set the chance to dodge any most physical attacks
 SN:W^Arena_%Y1_Summon_Creature_ID^/0; set the creature ID that should be summoned
 SN:W^Arena_%Y1_Summon_Creature_Numbers^/0; set the amount of creatures that will be summoned
 SN:W^Arena_%Y1_Block_Chance^/0; set the chance by which the stack will block
 SN:W^Arena_%Y1_Block_Value^/0; set the amount of defelect in percent from 1 to 100
-SN:W^Arena_%Y1_BuffSpell_ID_1^/0; set spell 1 ID which should be applied at battle start on stack 21
+SN:W^Arena_%Y1_BuffSpell_ID_1^/0; set spell 1 ID which should be applied at battle start on all original Boss stacks
 SN:W^Arena_%Y1_BuffSpell_Power_1^/; set spell power/effect of that spell, can have different meaning
-SN:W^Arena_%Y1_BuffSpell_ID_2^/0; set spell 2 ID which should be applied at battle start on stack 21
+SN:W^Arena_%Y1_BuffSpell_ID_2^/0; set spell 2 ID which should be applied at battle start on all original Boss stacks
 SN:W^Arena_%Y1_BuffSpell_Power_2^/; set spell power/effect of that spell, can have different meaning
+SN:W^Arena_%Y1_Phase_2_HP_Percent^/0; activate phase 2 once when an original Boss stack reaches this HP percentage
+SN:W^Arena_%Y1_Phase_2_All_Stats_Percent^/100; percentage applied to current Attack, Defense, min/max Damage and Speed
+SN:W^Arena_%Y1_Phase_2_Attack_Bonus^/0; additional Attack when phase 2 begins
+SN:W^Arena_%Y1_Phase_2_Defense_Bonus^/0; additional Defense when phase 2 begins
+SN:W^Arena_%Y1_Phase_2_Damage_Percent^/100; percentage applied to current min and max damage when phase 2 begins
+SN:W^Arena_%Y1_Phase_2_Speed_Bonus^/0; additional Speed when phase 2 begins
+SN:W^Arena_%Y1_Phase_2_Spell_ID^/0; spell applied permanently to the Boss when phase 2 begins
+SN:W^Arena_%Y1_Melee_Resistance^/0; additional resistance against melee damage in percent
+SN:W^Arena_%Y1_Ranged_Resistance^/0; additional resistance against ranged damage in percent
+SN:W^Arena_%Y1_Spell_Damage_Resistance^/0; additional resistance against spell damage in percent
+SN:W^Arena_%Y1_Round_Aura_Spell_ID^/0; spell effect applied to all living enemy stacks when the round aura activates
+SN:W^Arena_%Y1_Round_Aura_Spell_Duration^/1; duration of the round aura spell effect
+SN:W^Arena_%Y1_Round_Aura_Spell_Mastery^/3; mastery of the round aura spell effect
+SN:W^Arena_%Y1_Round_Aura_Damage^/0; Warrior-base damage dealt to every living enemy stack when the round aura activates
+SN:W^Arena_%Y1_Round_Aura_Interval^/1; activate the round aura every X battle rounds
+SN:W^Arena_%Y1_Round_Aura_Start^/1; first battle round on which the round aura may activate
+FU(Arena_Set_Boss_Battle_Def):P%Y1/^Creature.def^; replace the battlefield DEF of Boss stack 21
+FU(Arena_Set_Boss_Battle_Def):P%Y1/^Creature.def^/22; optionally target a specific defender stack from 21 to 41
 
+
+
+****************************************************************************************************
+
+
+*Stack-specific Boss appearance
+*The DEF name is copied into permanent storage so the engine can safely keep its pointer for the whole battle.
+!?FU(OnAfterErmInstructions);
+!!FU(NewStrArray)&i^Arena_Boss_Battle_Defs_By_Stack^=(NULL):P651/?i^Arena_Boss_Battle_Defs_By_Stack^/(M_STORED);
+
+
+!?FU(Arena_Set_Boss_Battle_Def);
+!#VA(arenaId:x) (defNamePtr:x) (battleStack:x);
+!#VA(numArgs:y) (stackOfSide:y) (storageIndex:y);
+*(arenaId) = Arena ID (16-30), (defNamePtr) = pointer to the battle DEF name
+*(battleStack) = optional absolute defender stack ID (21-41); defaults to primary Boss stack 21
+!!FU|(arenaId)<16/(arenaId)>30:E;
+!!FU:A?(numArgs);
+!!VR(battleStack)&(numArgs)<3:S21;
+!!FU|(battleStack)<21/(battleStack)>41:E;
+!!VR(stackOfSide):S(battleStack)-21;
+!!VR(storageIndex):S(arenaId)*21 +(stackOfSide);
+!!FU(NewStrArray)&i^Arena_Boss_Battle_Defs_By_Stack^=(NULL):P651/?i^Arena_Boss_Battle_Defs_By_Stack^/(M_STORED);
+!!SN:Vi^Arena_Boss_Battle_Defs_By_Stack^/(storageIndex)/z(defNamePtr);
+
+
+*TUM Reborn already hooks this initialization point for its Smooth Criminal disguise.
+*Subscribe to its event when TUM is active; otherwise install the Arena callback through ACM.
+!?FU(tum_BattleStack_InitDefsAndWavs)&i^Arena_Fight^;
+!!FU(Arena_Apply_Boss_Battle_Def):Px1;
+
+
+!?FU(Arena_BattleStack_InitDefsAndWavs)&i^Arena_Fight^;
+!!FU(Arena_Apply_Boss_Battle_Def):Px1;
+
+
+!?FU(Arena_Apply_Boss_Battle_Def);
+!#VA(hook:x) (arenaId:y) (defNamePtr:y) (firstChar:y) (stackStruct:y) (side:y) (stackOfSide:y) (storageIndex:y);
+*(hook) = native hook context
+!!SN:W^Arena_Challenge_Number^/?(arenaId);
+!!FU|(arenaId)<16/(arenaId)>30:E;
+!!FU&i^Arena_Boss_Battle_Defs_By_Stack^=(NULL):E;
+
+!!UN:C(hook)/(STRUCT_HOOK_CONTEXT_EBX)/4/?(stackStruct);
+!!FU&(stackStruct)=(NULL):E;
+!!UN:C(stackStruct)/244/4/?(side) C(stackStruct)/248/4/?(stackOfSide);
+!!FU|(side)<>(BATTLE_RIGHT)/(stackOfSide)<0/(stackOfSide)>20:E;
+
+!!VR(storageIndex):S(arenaId)*21 +(stackOfSide);
+!!SN:Mi^Arena_Boss_Battle_Defs_By_Stack^/?(defNamePtr)/(storageIndex);
+!!FU&(defNamePtr)=(NULL):E;
+!!UN:C(defNamePtr)/1/?(firstChar);
+!!FU&(firstChar)=0:E;
+
+!!UN:C(hook)/(STRUCT_HOOK_CONTEXT_ECX)/4/(defNamePtr); [battlefield appearance]
+!!UN:C(stackStruct)/128/4/(defNamePtr);             [creature information dialog]
 
 
 ****************************************************************************************************
@@ -44,7 +120,8 @@ SN:W^Arena_%Y1_BuffSpell_Power_2^/; set spell power/effect of that spell, can ha
 !!CM:D?y1;                              [get click position]
 !!BU:Ey1/?y2;                           [check if a monster is at that place]
 !!FU&y2=-1:E;                           [get monster ID at position and exit if no monster]
-!!if&y2>=21;                            [if clicked on stack 21]
+!!FU(Arena_Is_Original_Boss_Stack):Py2/?y90;
+!!if&y90=1;                             [if an original Boss stack was clicked]
   !!SN:W^Arena_Challenge_Number^/?y50;
   !!if&y50>=16/y50<=30;                 [Only set description for boss battles]
     !!VRz1:Ss^Arena_%Y50_Boss_Description^;
@@ -60,6 +137,14 @@ SN:W^Arena_%Y1_BuffSpell_Power_2^/; set spell power/effect of that spell, can ha
 !?FU(OnAfterTacticsPhase)&i^Arena_Fight^;[Moved timing from OnCombatRound to OnAfterTacticsPhase to have correct move order in battle]
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
+!!SN:W^Arena_Boss_PreAttack_Cast_Active^/0; [reset helper flag for a new fight or battle replay]
+
+!!re i/21/41;
+  !!FU(Arena_Mark_Original_Boss_Stack):Pi/0; [clear markers from a previous fight or battle replay]
+  !!SN:W^Arena_Boss_Phase_2_Activated_%i^/0;
+  !!SN:W^Arena_Boss_Initial_Count_%i^/0;
+  !!SN:W^Arena_Boss_Resurrection_Count_%i^/0;
+!!en;
 
 !!VRy30:Si^Arena_%Y1_Boss_Attack_Scaled^;      [Get Boss stats]
 !!VRy31:Si^Arena_%Y1_Boss_Defense_Scaled^;   
@@ -67,22 +152,41 @@ SN:W^Arena_%Y1_BuffSpell_Power_2^/; set spell power/effect of that spell, can ha
 !!VRy33:Si^Arena_%Y1_Boss_Damage_Scaled^;   
 !!VRy34:Si^Arena_%Y1_Boss_Health_Scaled^;   
 !!VRy35:Si^Arena_%Y1_Boss_Speed_Scaled^;
+!!VRy35&y1=23:S50;                     [Lich King: set first-turn Speed before the initial turn order is calculated]
 !!VRz10:Ss^Arena_%Y1_Boss_Name^;   
 !!FU|y30=0/y31=0/y33=0/y34=0/y35=0:E;   [Exit if no valid stats have been set]
 
 
 
 !!re i/21/41;
-  !!BMi:Ay30 Dy31 U1/y33 U2/y33 U3/y32 Hy34 Sy35 F?y40 F?y41 T?y42; [Set Parameters of the creature]
-  !!VRy41:|65536;                       [set no enemy retaliation flag]
-  !!BMi:Fy41;                           [set no enemy retaliation flag]
+  !!BMi:T?y42 N?y43 I?y44;             [get type, number and side before changing the stack]
+  !!if&y42>=0/y43>0/y44=1;             [only configure defender stacks that actually exist at battle start]
+    !!FU(Arena_Mark_Original_Boss_Stack):Pi/1;
+    !!SN:W^Arena_Boss_Initial_Count_%i^/y43;
+    !!BMi:Ay30 Dy31 U1/y33 U2/y33 U3/y32 Hy34 Sy35 F?y41; [Set Parameters of the creature]
+    !!VRy41:|65536;                     [set no enemy retaliation flag]
+    !!BMi:Fy41;                         [set no enemy retaliation flag]
+  !!en;
 !!en;
+
+
+!?FU(Arena_Mark_Original_Boss_Stack);
+*x1 = battle stack ID, x2 = 1 for an original Boss stack or 0 otherwise
+!!SN:W^Arena_Boss_Original_Stack_%X1^/x2;
+
+
+!?FU(Arena_Is_Original_Boss_Stack);
+*x1 = battle stack ID, x2 = stored result
+!!VRx2:S0;
+!!FU|x1<21/x1>41:E;
+!!SN:W^Arena_Boss_Original_Stack_%X1^/?x2;
 
 
 *All bosses are imune to fear. Code by Archer
 !?FU(ACM_CreateERMHook);
 !#VA(setHook:x);
 !!SN:E(setHook)/1/4606276/(ACM_OnCheckFear); 464944
+!!SN&i^tum_reborn_on^<>(TRUE):E(setHook)/1/4446789/(Arena_BattleStack_InitDefsAndWavs); 43DA45
 
 !?FU(ACM_OnCheckFear)&i^Arena_Fight^;
 !#VA(hook:x);
@@ -94,7 +198,8 @@ SN:W^Arena_%Y1_BuffSpell_Power_2^/; set spell power/effect of that spell, can ha
 !!VR(stackId:y):S(side) *(BATTLE_STACKS_PER_SIDE) +(stackOfSide);
 
 ; Add your condition
-!!if&(stackId)>=21;
+!!FU(Arena_Is_Original_Boss_Stack):P(stackId)/?y90;
+!!if&y90=1;
   ......
   ; Skip Fear
   !!SN:X?t/0;
@@ -121,7 +226,8 @@ Some scripts that are enabled in all Arena Boss battle fights
     !!MF:N?y4;                          [damage receiving stack]
     !!BG:N?y5;
     !!BMy4:I?y7 H?y6;                   [Monster Side Index and max HP]
-    !!if&y4=21;                         [if any defender stack and defender side]
+    !!FU(Arena_Is_Original_Boss_Stack):Py4/?y91;
+    !!if&y4>=21/y4<=41/y91=1;          [if an original Arena defender stack]
       !!MF:F?y9;                        [get damage]
       !!VRy6:*20:100;                   [get 20% of max HP of Raid Boss]
       !!MF&y9>y6:Fy6;                   [Set damage to max 20%]
@@ -139,7 +245,8 @@ Some scripts that are enabled in all Arena Boss battle fights
     !!MR:N?y4;                          [damage receiving stack]
     !!BG:N?y5;
     !!BMy4:I?y7 H?y6;                   [Monster Side Index and max HP]
-    !!if&y4=21;                         [if any defender stack and defender side]
+    !!FU(Arena_Is_Original_Boss_Stack):Py4/?y91;
+    !!if&y4>=21/y4<=41/y91=1;          [if an original Arena defender stack]
       !!MR:F?y9;                        [get damage]
       !!VRy6:*25:100;                   [get 25% of max HP of Raid Boss]
       !!MR&y9>y6:Fy6;                   [Set magic damage]
@@ -156,8 +263,9 @@ This is done to reduce the chance of strong single units tanking the monster bec
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
 
-!!if&x1=21;                             [if any valid battlestack]
-  !!if&x2>=0/x2<=20;                    [if any valid battlestack]
+!!if&x1>=21/x1<=41;                     [if any valid defender battlestack]
+  !!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
+  !!if&x2>=0/x2<=20/y90=1;             [if an original Boss stack attacks]
     !!BMx2:N?y2;                        [get number of units]    
     !!VRx4&y2=1:*3:2;                   [with 100% chance to deal +50% damage]
   !!en;
@@ -176,7 +284,8 @@ This is done to reduce the chance of strong single units tanking the monster bec
     !!MF:N?y4;                          [damage receiving stack]
     !!BG:N?y5;
     !!BMy4:I?y7 H?y6;                   [Monster Side Index and max HP]
-    !!if&y4=21;                         [if any defender stack and defender side]
+    !!FU(Arena_Is_Original_Boss_Stack):Py4/?y90;
+    !!if&y90=1;                         [if an original Boss stack]
       !!MF:F0;                          [set damage to zero]
     !!en;
   !!en;
@@ -191,6 +300,8 @@ Also after 8 combat round stats begin to increase slowly
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
 
 !!re i/21/41;
+  !!FU(Arena_Is_Original_Boss_Stack):Pi/?y90;
+  !!if&y90=1;
     !!FU(AC_ResetSpellFromStack):Pi/42; [42 Curse]
     !!FU(AC_ResetSpellFromStack):Pi/52; [52 Misfortune]
     !!FU(AC_ResetSpellFromStack):Pi/45; [45 Weakness]
@@ -207,11 +318,17 @@ Also after 8 combat round stats begin to increase slowly
     *!FU(AC_ResetSpellFromStack):Pi/73;[Disease]
     !!FU(AC_ResetSpellFromStack):Pi/74; [Paralyze]
     *!FU(AC_ResetSpellFromStack):Pi/75;[Age]
+  !!en;
 !!en;
 
-!!BM21:S?y5 H?y6;                       [Get Creature Speed and HP]
-!!BM21&y5<4:S4;                         [reset speed to 4 if it is to low]
-!!BM21&v997>=8:Sd1 Ad2 Dd2 U2/d25;      [slowly increase stats after round 8]
+!!re i/21/41;
+  !!BMi:T?y4 N?y7 S?y5 H?y6;           [Get creature type, amount, speed and HP]
+  !!FU(Arena_Is_Original_Boss_Stack):Pi/?y90;
+  !!if&y4>=0/y7>0/y90=1;               [only process living original Boss stacks]
+    !!BMi&y5<4:S4;                      [reset speed to 4 if it is too low]
+    !!BMi&v997>=8:Sd1 Ad2 Dd2 U2/d25;   [slowly increase stats after round 8]
+  !!en;
+!!en;
 
 
 *Arena Boss monsters have a 25% Magic Resistance Dwarv Type
@@ -221,7 +338,8 @@ Also after 8 combat round stats begin to increase slowly
 
 !!MR:N?y1;                              [Get Creature Number]
 !!BMy1:I?y2 T?y3;                       [Get Creature Side]
-!!if&y1>=21/y1<=41;                     [if an enemy stack]
+!!FU(Arena_Is_Original_Boss_Stack):Py1/?y12;
+!!if&y12=1;                             [if an original Boss stack]
   !!MR:F?y40;
   !!VRy40:+25;                          [Add MR from com class to current MR value]
   !!VRy40&y40>100:S100;
@@ -233,7 +351,8 @@ Also after 8 combat round stats begin to increase slowly
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
 !!MR:N?y5 S?y30;                        [Get Creature number which took magic damage]
-!!if&y5>=21/y5<=41;                     [if an enemy stack]
+!!FU(Arena_Is_Original_Boss_Stack):Py5/?y12;
+!!if&y5>=21/y5<=41/y12=1;              [if an original Arena defender stack]
   !!MR:F?y10; !!FU&y10=0:E;             [Final (corrected) damage]
   !!VRy11:Sy10*75:100;                  [make 25% damage reduction]
   !!MR&y11>0:Fy11;                      [Set to damage without any reduction]
@@ -247,27 +366,34 @@ Also after 8 combat round stats begin to increase slowly
 
 !!if&x1>=0/x1<=20;                      [if any valid attacker battlestack]
   !!if&x2>=21/x2<=41;                   [if any valid battlestack]
-    !!VRx4:*80:100;                     [20% damage reduction]
+    !!FU(Arena_Is_Original_Boss_Stack):Px2/?y91;
+    !!VRx4&y91=1:*80:100;               [20% damage reduction for original Arena stacks]
     !!VRx4&x4<0:S0;                     []
   !!en;
 !!en;
 
 
-*damage increase and reduction. All bosses will deal +1000 damage and absorb 500 flat damage
+*Difficulty-scaled damage increase and reduction. Warrior values: +1000 damage and 500 flat damage reduction
 !?FU(OnStackToStackDamage)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
 
 !!if&x1>=0/x1<=20;                      [if any valid attacker battlestack]
   !!if&x2>=21/x2<=41;                   [if any valid battlestack]
-    !!VRx4:-500;                        [-500 flat damage reduction]
-    !!VRx4&x4<0:S0;                     []
+    !!FU(Arena_Is_Original_Boss_Stack):Px2/?y91;
+    !!if&y91=1;
+      !!FU(Arena_Apply_Boss_Effect_Difficulty):P500/?y90;
+      !!VRx4:-y90;                      [difficulty-scaled flat damage reduction]
+      !!VRx4&x4<0:S0;                   []
+    !!en;
   !!en;
 !!en;
 
 !!if&x1>=21/x1<=41;                     [if any valid defender battlestack]
-  !!if&x2>=0/x2<=20;                    [if any valid battlestack]
-    !!VRx4:+1000;                       [+1000 damage]
+  !!FU(Arena_Is_Original_Boss_Stack):Px1/?y91;
+  !!if&x2>=0/x2<=20/y91=1;             [if an original Boss stack attacks]
+    !!FU(Arena_Apply_Boss_Effect_Difficulty):P1000/?y90;
+    !!VRx4:+y90;                        [difficulty-scaled flat bonus damage]
   !!en;
 !!en;
 
@@ -277,7 +403,8 @@ tbd if I keep it
 !?FU(ACM_OnAfterAttack)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!FU|y1<16/y1>30:E;                     [Exit of no boss battle arena ID]
-!!if&x1=21;                             [If Raid Boss]
+!!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
+!!if&y90=1;                             [If an original Boss stack]
   !!VRy3:S2;                            [Set 2% chance]
   !!VRy1:S0R100; !!BMx2&y1<=y3:M70/3/3; [Stone]
   !!VRy1:S0R100; !!BMx2&y1<=y3:M71/3/3; [Poison]
@@ -306,7 +433,8 @@ tbd if I keep it
 
 !!if&x1>=0/x1<=20;                      [if any valid battlestack]
   !!if&x2>=21/x2<=41;                   [if any valid battlestack]
-    !!VRx4&y1=1/y2=0:*70:100;           [30% damage reduction]
+    !!FU(Arena_Is_Original_Boss_Stack):Px2/?y90;
+    !!VRx4&y1=1/y2=0/y90=1:*70:100;     [30% damage reduction for original Boss stacks]
   !!en;
 !!en;
 
@@ -314,8 +442,9 @@ tbd if I keep it
 !!VRy23&y1=1/y2=0:Sy22*100;             [Add 100 extra damage per game month with attacks]
 
 !!if&x1>=21/x1<=41;                     [if any valid battlestack]
-  !!if&x2>=0/x2<=20;                    [if any valid battlestack]
-    !!VRx4&y1=1/y2=0:+y23;              [+100 damage per month with attacks]
+  !!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
+  !!if&x2>=0/x2<=20/y90=1;             [if an original Boss stack attacks]
+    !!VRx4&y1=1/y2=0:+y23;              [+100 damage per month with Boss attacks]
   !!en;
 !!en;
 
@@ -325,11 +454,12 @@ tbd if I keep it
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 
 !!SN:W^Arena_%Y1_Cast_Spells^/?y5; !!FU&y5=0:E;
-!!SN:W^Arena_%Y1_Cast_Spell_ID^/?y20; !!FU&y20=0:E;
+!!SN:W^Arena_%Y1_Cast_Spell_ID^/?y20;  [0 selects a random damage spell]
 
 !!BG:A?y7 E?y2 N?y3 D?y4;               [Aktion in y1]
+!!FU(Arena_Is_Original_Boss_Stack):Py3/?y90;
 !!if|y7=6/y7=7;
-!!if&y2>=0/y2<=41/y3>=21/y4>-1;         [if all conditions are true]
+!!if&y2>=0/y2<=41/y3>=21/y4>-1/y90=1; [if an original Boss stack attacks a valid target]
   !!re i/1/y5;
     !!VRy9:S1R8;                        [choose random spell]
     !!VRy10&y9=1:S15;                   [spell magic arrow]
@@ -347,6 +477,7 @@ tbd if I keep it
       !!SSy10:E3/?y21 P?y22;            [Save spell effect for expert and power]
       !!SSy10:E3/y8 P0;                 [Set temporarily to zero]
     !!en;
+    !!SN:W^Arena_Boss_PreAttack_Cast_Active^/1; [its action end must not consume Act Twice]
     !!BMy3:Cy10/y4/3/3/1;               [apply cast to target from currently acting stack]
     !!SSy10&y8>0:E3/y21 Py22;           [Restore spell effect and power to saved values]
   !!en;
@@ -354,23 +485,22 @@ tbd if I keep it
 !!en;
 
  
-*function to give extra attacks/shots to creatures
+*Legacy low-level routine for additional melee strikes.
+*Extra shots are handled reliably through ACM_OnAfterShoot below.
 !?FU(OnBeforeBattleAction)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 
 !!SN:W^Arena_Boss_Strikes^/0;           [reset flag or reset it at BG1]
 !!BG:A?y4 N?y5;                         [get action and current stack]
-!!SN&y4=7:W^Arena_%Y1_Extra_Shots^/?y6;
+!!FU(Arena_Is_Original_Boss_Stack):Py5/?y90;
 !!SN&y4=6:W^Arena_%Y1_Extra_Melee^/?y6;
-!!FU&y6=0:E;
+!!FU&y4<>6/y6=0:E;
 
-!!if|y4=6/y4=7;                         [if melee or shot]
-!!if&y5>=21/y5<=41/y6>0;                [If attacking between 21 and 41]
+!!if&y5>=21/y5<=41/y6>0/y90=1;         [If an original Boss stack attacks in melee]
   !!SN:W^Arena_Boss_Strikes^/dy6;
 !!en;
-!!en;
 
-!?BG1&i^Arena_Fight^;                   [Trigger to handle extra shoots and additional strikes]
+!?BG1&i^Arena_Fight^;                   [Reset the legacy additional-melee counter]
 !!SN:W^Arena_Boss_Strikes^/0;           [reset flag or reset it at BG1]
 
 !?FU(OnStartOrLoad)&i^Arena_Mod_Active^=1;
@@ -378,7 +508,6 @@ tbd if I keep it
 !!FU&y1=0:E;
 !!SN:Ay1/^SetHook^/?y2;
 !!SN:Ey2/1/7381311/(Arena_Boss_Extra_Strike); [hook at <after metee_attack>]
-!!SN:Ey2/1/4456346/(Arena_Boss_Extra_Shot);   [hook at <after shoot>]
 
 !?FU(Arena_Boss_Extra_Strike)&i^Arena_Fight^; Extra Melee Attack
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]          
@@ -413,36 +542,35 @@ tbd if I keep it
 !!SN&y30>0:G18;
 
 
-!?FU(Arena_Boss_Extra_Shot)&i^Arena_Fight^; Extra Shoot Attack
-!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
-!!SN:X?y1/1;                            [edi]
-!!SN:W^Arena_Boss_Strikes^/?y30;
-!!SN:W^Arena_Boss_Strikes^/0;
-!!FU&y30<1:E;
-!!VRy2:Sy1+4;                           [esi]
-!!UN:Cy2/4/?y10;                        [A_STACK]
-!!VRy3:Sy1+16;                          [ebx]
-!!UN:Cy3/4/?y20;                        [D_STACK]
-!!VRy11:Sy10+52;                        [8#]
-!!VRy12:Sy10+76;
-!!VRy13:Sy10+656;
-!!VRy14:Sy10+688;
-!!VRy15:Sy10+704;
-!!VRy16:Sy10+216;
-!!VRy21:Sy20+52;
-!!VRy22:Sy20+76;
-!!UN:Cy11/4/?y31;                       [BM:T]16#]
-!!UN:Cy12/4/?y32;                       [BM:N]
-!!UN:Cy13/4/?y33;                       [BM:G62]
-!!UN:Cy14/4/?y34;                       [BM:G70]
-!!UN:Cy15/4/?y35;                       [BM:G74]
-!!UN:Cy16/4/?y36;                       [BM:U3]
-!!UN:Cy21/4/?y41;                       [BM:T]
-!!UN:Cy22/4/?y42;                       [BM:N]
-!!FU|y31<0/y32<1/y41<0/y42<1/y33>0/y34>0/y35>0/y36<1:E;
-!!SN:E4453920/2/y10/y20;
-!!VRy30:-1;
-!!SN&y30>0:G16;
+**********************************Configured extra shots********************************************
+*Refill the configured number whenever an original Boss stack obtains a real turn.
+!?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^;
+!#VA(stackSide:x) (stackInd:x);
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!!VRy2:Sx1*21+x2;                        [convert side and side index to battle stack ID]
+!!FU(Arena_Is_Original_Boss_Stack):Py2/?y90;
+!!FU&y90<>1:E;
+!!SN:W^Arena_%Y1_Extra_Shots^/?y3;
+!!VRy3&y3<0:S0;
+!!SN:W^Arena_Boss_Extra_Shots_Remaining_%Y2^/y3;
+
+*Fire at the selected target until the per-turn counter is empty.
+*If that target dies, select another living enemy for the remaining shots.
+!?FU(ACM_OnAfterShoot)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!#VA(atkStack:x) (defStack:x);
+!!FU(Arena_Is_Original_Boss_Stack):P(atkStack)/?y90;
+!!FU&y90<>1:E;
+!!SN:W^Arena_Boss_Extra_Shots_Remaining_%(atkStack)^/?y20;
+!!FU&y20<=0:E;
+!!SN:W^Arena_Boss_Extra_Shots_Remaining_%(atkStack)^/d-1;
+
+!!VRy23:S(defStack);
+!!BM(defStack):N?y21 I?y22;
+!!if|y21<=0/y22=1;
+  !!FU(ACM_GetRandomLivingStackFromSide):P0/?y23/(NO_STACK)/(TRUE)/(FALSE);
+!!en;
+!!FU(BattleStack_Shoot)&y23>(NO_STACK):P(atkStack)/y23;
 
 
 **********************************Random attack Multishot*******************************************
@@ -455,9 +583,10 @@ Can shot multi targets at once
 !!BA:Q?y1; !!FU&y1=1:E;                 [Exit in Quick Combat]
 !!VRy1:Sx1;                             [acting stack]
 !!BMx1:I?y2;                            [Acting Side Monster]
+!!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
 
 !!BMx1:T?y3 P?y9;                       [Get Creature Number and current battlefield position]
-!!if&y2=1;                              [if the correct creature or defeding side]
+!!if&y2=1/y90=1;                       [if an original Boss stack shoots]
   !!SN&y2=1:W^Arena_Boss_Shots_Def^/?y20;[get number of random extra shots]
   !!FU&y20=0:E;                         [exit if no extra shot is available]
   !!SN&y2=1:W^Arena_Boss_Shots_Def^/d-1;[reduce number of extra shots by 1]
@@ -534,7 +663,8 @@ Set the number of times the Boss attacks an additional target in melee
 !!VRy1:Sx1;                             [acting stack]
 !!BMx1:I?y2;                            [Acting Side Monster]
 !!BMx1:T?y3 P?y9;                       [Get Creature Number and current battlefield position]
-!!if&y2=1/x1=21;                        [if defending side and attacking stack ID 21]
+!!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
+!!if&y2=1/x1>=21/x1<=41/y90=1;         [if an original Boss stack attacks]
   !!SN:W^Arena_Boss_Extra_Melee_Strike^/d-1; [reduce strike by one]
   !!FU(ACM_GetRandomLivingStackFromSide)&y30>0:P0/?y10/(NO_STACK)/(TRUE)/(FALSE);
   !!FU(ACM_BattleStack_MeleeAttack)&y30>0:Px1/y10/0; [make the stack attack another stack in melee combat]
@@ -562,16 +692,45 @@ Set the number of times the Boss attacks an additional target in melee
 *Set Resurrect script, lets creatures revive with a given HP value
 !?FU(ACM_OnAfterMelee)&i^Arena_Fight^;
 !#VA(atkStack:x) (defStack:x);
+!!FU(Arena_Boss_TryResurrect):P(defStack);
+
+!?FU(ACM_OnAfterShoot)&i^Arena_Fight^;
+!#VA(atkStack:x) (defStack:x);
+!!FU(Arena_Boss_TryResurrect):P(defStack);
+
+*After every completed action, scan all defender stacks as a fallback for spell and other damage
+!?FU(OnBattleActionEnd)&i^Arena_Fight^;
+!!re i/21/41;
+  !!FU(Arena_Boss_TryResurrect):Pi;
+!!en;
+
+!?FU(Arena_Boss_TryResurrect);
+!#VA(stackId:x);
+!!FU|(stackId)<21/(stackId)>41:E;
+!!FU(Arena_Is_Original_Boss_Stack):P(stackId)/?y90;
+!!FU&y90<>1:E;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
 !!SN:W^Arena_%Y1_Resurrect_Value^/?y2; !!FU&y2=0:E;
 !!SN:W^Arena_%Y1_Resurrect_Times^/?y7; !!FU&y7=0:E;
-!!BM(atkStack):N?y3;
-!!BM(defStack):N?y4;
-!!BM(defStack):T?y5 N?y10 I?y11;        [get defending stack type, number and side]
-!!if&(defStack)=21/y10=0/y7>0;  
-  !!FU(Arena_Boss_Stack_Resurrect):P(defStack)/y2/0/1; [call resurrect fct if unit is dead]
+!!BM(stackId):T?y5 N?y10 I?y11;         [get defending stack type, number and side]
+!!if&y5>=0/y10=0/y11=1/y7>0;
+  !!FU(Arena_Boss_Stack_Resurrect):P(stackId)/y2/0/1; [call resurrect fct if unit is dead]
   !!SN:W^Arena_%Y1_Resurrect_Times^/d-1;[reduce counter by one]
-  !!SN&y1=23:W^Arena_23_Once_Flag^/1;   [extra flag for Arena 23]
+
+  *Apply optional resurrection progression only after the stack was revived successfully.
+  !!BM(stackId):N?y10 S?y11;
+  !!if&y10>0;
+    !!SN:W^Arena_Boss_Resurrection_Count_%X1^/?y8;
+    !!VRy8:+1;
+    !!SN:W^Arena_Boss_Resurrection_Count_%X1^/y8;
+
+    !!SN:W^Arena_%Y1_Resurrect_Speed_Bonus^/?y9;
+    !!VRy11&y9>0:+y9;
+    !!BM(stackId)&y9>0:Sy11;
+
+    !!SN:W^Arena_%Y1_Act_Twice_After_Resurrection^/?y9;
+    !!SN&y9>0/y8>=y9:W^Arena_%Y1_Act_Twice^/1;
+  !!en;
 !!en;
 
 !?FU(Arena_Boss_Stack_Resurrect); [revive a stack By 007]
@@ -630,7 +789,8 @@ Set the number of times the Boss attacks an additional target in melee
     !!if|y3=6/y3=7;                     [If Melee or Range]
     !!MF:N?y4;                          [damage receiving stack]
     !!BMy4:I?y5 S?y6;                   [Monster Side Index type and speed]
-    !!if&y4>=21/y3<=41/y5=1;            [if any defender stack and defender side]
+    !!FU(Arena_Is_Original_Boss_Stack):Py4/?y90;
+    !!if&y4>=21/y4<=41/y5=1/y90=1;     [if an original Boss stack]
       !!VRy20:S0R100;                   [Generate Random number]
       !!VRy22:Sy2;                      [Set the chance to dodge to +XX%]
       !!if&y20<=y22;                    [chance is ]
@@ -638,7 +798,7 @@ Set the number of times the Boss attacks an additional target in melee
         !!SN&i^battle_isVisible^:Pz-1;
         !!MF:E0;                        [set damage to zero]
         !!MF:F0;                        [set final damage to zero]
-        !!SN:T^raid_monster.Air Dodge^/?z-1;
+        !!SN:T^AC_Arena.Air_Dodge^/?z-1;
         !!BU&i^battle_isVisible^:Mz-1;  [show message in log]
       !!en;
     !!en;
@@ -653,10 +813,11 @@ Standard value is currently xx%
 !#VA(stackId:x) (finalValue:x) (stdValue:x);
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 !!SN:W^Arena_%Y1_Regeneration_Value^/?y2; !!FU&y2=0:E;
-!!if&x1=21;                             [for any Arena Boss]
-  !!BM(stackId):T?y3 H?y4;              [get monster type and health]
+!!FU(Arena_Is_Original_Boss_Stack):P(stackId)/?y90;
+!!if&y90=1;                             [for an original Boss stack]
+  !!BM(stackId):T?y3 N?y5 H?y4;         [get monster type, amount and health]
   !!VRy4:*y2:100;                       [percent of health]
-  !!VR(finalValue)&(stackId)>=21/(stackId)<=41:Sy4; [set regeneration value]
+  !!VR(finalValue)&y3>=0/y5>0:Sy4;       [set regeneration value]
 !!en;
 
 
@@ -671,7 +832,8 @@ Trigger maybe different, like ObtainsTurn, OnNewRound, or even BG
 
 !!VRy20:Si^battle_current_stack^;
 !!BMi^battle_current_stack^:T?y4 I?y5 H?y6; [Get type and side of current battlestack and health points]
-!!FU|y4=0/y20<>21:E;                    [Exit if it is not the Arena Boss]
+!!FU(Arena_Is_Original_Boss_Stack):Py20/?y90;
+!!FU|y4=0/y90<>1:E;                    [Exit if it is not an original Boss stack]
 
 !!FU(Arena_Boss_CheckIfPossibleToSummon):Py5/?y21; !!FU&y21=0:E; [Exit if conditions not met]
 
@@ -707,11 +869,22 @@ x1=battlefield position
 
 ****************************************************************************************************
 *to act additional times in combat
+!?FU(Arena_Boss_Grant_Extra_Action);
+!!SN:W^Arena_Challenge_Number^/?y50; !!FU&y50=0:E;
+!!SN:W^Arena_%Y50_Act_Twice^/?y51; !!FU&y51=0:E;
+!!SN:W^Arena_Boss_acting_stack^/?y52;
+!!FU(Arena_Is_Original_Boss_Stack):Py52/?y90;
+!!FU&y90<>1:E;
+!!SN:W^Arena_Boss_abilityCounter_%Y52^/?y53;
+!!FU&y53<>0:E;                          [the extra action was already granted this round]
+!!BMy52:Fd~(MON_FLAG_ACTED);            [make the original Boss stack available again]
+!!SN:W^Arena_Boss_abilityCounter_%Y52^/d-1;
+!!VRz1:S^{~r}Arena Boss acts again{~}^;
+!!BU:Mz1;
+
 !?FU(OnCombatRound)&i^battle_round^>=0/i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
-!!SN:W^Arena_%Y1_Act_Twice^/?y2;  !!FU&y2=0:E; [Set amount of actings per round]
-
-!!SN:W^Arena_Boss_acting_stack^/-1;     [reset act twice counter and battle stack each new battle round]
+!!SN:W^Arena_Boss_acting_stack^/-1;     [reset act twice state every round, including dynamically enabled rounds]
 !!if&i^battle_round^>=0;
   !!re i/0/41;                          [loop all stacks and reset]
     !!SN:W^Arena_Boss_abilityCounter_%i^/0;
@@ -731,32 +904,20 @@ x1=battlefield position
      y1<>10/
      y1<>11:E;                          exit for wrong condition
 
-!!BMy2:T?y3 I?y4 N?y5;                  [get type and side]
-!!if|y2=21/y2=22/y2=23;                 [If raid boss]
-  !!VRy20:S0R1;                         [make a coin flip]
-  !!if&y6>=0;                           [if a valid target stack]
-    !!BMy6:N?y13 F?y14 F?y15;           [get number of attacked monsters]
-    !!VRy14:&4194304;                   [Check for Summoning flag]
-    !!VRy15:&12582912;                  [Check for Clone flag]
-    !!VRy20|y13=1/y14>0/y15>0:S1;       [Set higher chance to act again if just one unit, or summoned or cloned]
-    !!VRy20:S1;
-  !!en;
-  !!SN&y20=1:W^Arena_Boss_acting_stack^/y2; [set and save stack that should act twice]
+!!BMy2:T?y3 I?y4 N?y5;                  [get type, side and amount]
+!!FU(Arena_Is_Original_Boss_Stack):Py2/?y90;
+!!if&y2>=21/y2<=41/y3>=0/y4=1/y5>0/y90=1; [If a living original Boss stack]
+  !!SN:W^Arena_Boss_acting_stack^/y2;   [set and save stack that should act twice]
 !!en;
 
 
 !?FU(OnBattleActionEnd)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
+!!SN:W^Arena_Boss_PreAttack_Cast_Active^/?y3;
+!!SN&y3=1:W^Arena_Boss_PreAttack_Cast_Active^/0;
+!!FU&y3=1:E;                            [ignore the completed auxiliary pre-attack spell]
 !!SN:W^Arena_%Y1_Act_Twice^/?y1;  !!FU&y1=0:E; [Set amount of actings per round]
-
-!!SN:W^Arena_Boss_acting_stack^/?y1;
-!!if&y1>=21/y1<=41;                     [if a valid defender battle stack]
-  !!SN:W^Arena_Boss_abilityCounter_%Y1^/?y2; [check ability counter]
-  !!BMy1&y2=0:Fd~(MON_FLAG_ACTED);      [set act twice flag for stack]
-  !!SN:W^Arena_Boss_abilityCounter_%Y1^/d-1; [reduce ability counter]
-  !!VRz1&y2=0:S^{~r}Arena Boss acts again{~}^;
-  !!BU&y2=0:Mz1;
-!!en;
+!!FU(Arena_Boss_Grant_Extra_Action):P;
 
 !?FU(OnBeforeBattleStackTurn)&i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
@@ -781,7 +942,8 @@ x1=battlefield position
 !!BG:A?y1;                              [Aktion in y1]
 !!FU&y1<>6:E;                           [or Melee]
 !!BG:N?y1;                              [Attacking Stack]
-!!if&y1>=21/y1<=41;                     [if any defending stack]
+!!FU(Arena_Is_Original_Boss_Stack):Py1/?y90;
+!!if&y90=1;                             [if an original Boss stack attacks]
   !!MF:N?y4;                            [damage receiving stack]
   !!BMy4:T?y40;                         [Get Type in y40]
   !!BMy1:I?y5;                          [Side index as for heroes (0:left, 1:right)]
@@ -834,9 +996,10 @@ x1=battlefield position
 !!MF:W?y80;
 !!FU&y80>0:E;                           [exit if wrong damage type]
 !!BG:A?y1;                              [get battle action]
-!!if|y1=6/y6=7;                         [or melee or shot]
+!!if|y1=6/y1=7;                         [melee or shot]
   !!MF:N?y4;                            [damage receiving stack]
-  !!FU&y4<>21:E;                        [So it only works for Arena Boss]
+  !!FU(Arena_Is_Original_Boss_Stack):Py4/?y90;
+  !!FU&y90<>1:E;                        [only works for original Boss stacks]
   !!MF:F?y6;                            [Damage Dealt]
   !!VRy6:*y3:100;                       [make XX% of damage]
   !!if&y6>0;                            [if positive damage]
@@ -849,28 +1012,195 @@ x1=battlefield position
 
 
 ****************************************************************************************************
-*Apply spells to Arena Boss at battlestart, at stack ID 21
+*Apply configured spells to all living Arena defender stacks at battle start
 !?FU(OnBattleRound)&v997=0/i^Arena_Fight^;
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E; [Exit if it is not Arena Fight]
 
-!!SN:W^Arena_%Y1_BuffSpell_ID_1^/?y2; !!FU&y2=0:E; 
-!!SN:W^Arena_%Y1_BuffSpell_Power_1^/?y3; !!FU&y3=0:E; 
+!!SN:W^Arena_%Y1_BuffSpell_ID_1^/?y2;
+!!SN:W^Arena_%Y1_BuffSpell_Power_1^/?y3;
+!!FU(Arena_Boss_ApplyBuffSpell)&y2>0/y3<>0:Py2/y3;
 
-!!SSy2:E3/?y20;                         [get effect for expert rank]
-!!SSy2:E3/y3;                           [set new effect value]
-!!BM21:My2/99/3;                        [apply spell to stack 21]
-!!BM22:My2/99/3;                        [apply spell to stack 22]
-!!BM23:My2/99/3;                        [apply spell to stack 23]
-!!BM24:My2/99/3;                        [apply spell to stack 24]
-!!SSy2:E3/y20;                          [reset spell effect]
+!!SN:W^Arena_%Y1_BuffSpell_ID_2^/?y2;
+!!SN:W^Arena_%Y1_BuffSpell_Power_2^/?y3;
+!!FU(Arena_Boss_ApplyBuffSpell)&y2>0/y3<>0:Py2/y3;
 
-!!SN:W^Arena_%Y1_BuffSpell_ID_2^/?y2; !!FU&y2=0:E; 
-!!SN:W^Arena_%Y1_BuffSpell_Power_2^/?y3; !!FU&y3=0:E; 
+!?FU(Arena_Boss_ApplyBuffSpell);
+!#VA(spellId:x) (spellPower:x);
+!!SS(spellId):E3/?y20;                  [get effect for expert rank]
+!!SS(spellId):E3/(spellPower);           [set new effect value]
+!!re i/21/41;
+  !!BMi:T?y2 N?y3 I?y4;
+  !!FU(Arena_Is_Original_Boss_Stack):Pi/?y90;
+  !!BMi&y2>=0/y3>0/y4=1/y90=1:M(spellId)/99/3; [apply spell to each living original Boss stack]
+!!en;
+!!SS(spellId):E3/y20;                   [reset spell effect]
 
-!!SSy2:E3/?y20;                         [get effect for expert rank]
-!!SSy2:E3/y3;                           [set new effect value]
-!!BM21:My2/99/3;                        [apply spell to stack 21]
-!!BM22:My2/99/3;                        [apply spell to stack 22]
-!!BM23:My2/99/3;                        [apply spell to stack 23]
-!!BM24:My2/99/3;                        [apply spell to stack 24]
-!!SSy2:E3/y20;                          [reset spell effect]
+
+****************************************************************************************************
+*Optional phase 2. Each original Boss stack activates it once after falling below the configured HP percentage.
+!?FU(OnBattleActionEnd)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!!SN:W^Arena_%Y1_Phase_2_HP_Percent^/?y2; !!FU&y2<=0:E;
+!!re i/21/41;
+  !!FU(Arena_Boss_CheckPhase2):Pi;
+!!en;
+
+!?FU(Arena_Boss_CheckPhase2);
+*x1 = battle stack ID
+!!FU(Arena_Is_Original_Boss_Stack):Px1/?y90;
+!!FU&y90<>1:E;
+!!BMx1:T?y2 N?y3 H?y4 L?y5 I?y6;
+!!FU|y2<0/y3<=0/y4<=0/y6<>1:E;
+!!SN:W^Arena_Boss_Initial_Count_%X1^/?y7; !!FU&y7<=0:E;
+!!SN:W^Arena_Challenge_Number^/?y1;
+!!SN:W^Arena_%Y1_Phase_2_HP_Percent^/?y8;
+!!VRy9:Sy3*y4-y5;                       [current total stack HP]
+!!VRy10:Sy7*y4;                         [total stack HP at battle start]
+!!VRy9:*100:y10;                        [current HP percentage]
+!!FU&y9>y8:E;
+!!SN:W^Arena_Boss_Phase_2_Activated_%X1^/?y11; !!FU&y11>0:E;
+!!SN:W^Arena_Boss_Phase_2_Activated_%X1^/1;
+
+!!SN:W^Arena_%Y1_Phase_2_All_Stats_Percent^/?y19;
+!!VRy19&y19<=0:S100;
+!!if&y19<>100;
+  !!BMx1:A?y20 D?y21 S?y22 U1/?y16 U2/?y17;
+  !!VRy20:*y19:100;
+  !!VRy21:*y19:100;
+  !!VRy22:*y19:100;
+  !!VRy16:*y19:100;
+  !!VRy17:*y19:100;
+  !!VRy20&y20<1:S1;
+  !!VRy21&y21<1:S1;
+  !!VRy22&y22<1:S1;
+  !!VRy16&y16<1:S1;
+  !!VRy17&y17<1:S1;
+  !!BMx1:Ay20 Dy21 Sy22 U1/y16 U2/y17;
+!!en;
+
+!!SN:W^Arena_%Y1_Phase_2_Attack_Bonus^/?y12;
+!!SN:W^Arena_%Y1_Phase_2_Defense_Bonus^/?y13;
+!!SN:W^Arena_%Y1_Phase_2_Speed_Bonus^/?y14;
+!!BMx1&y12<>0:Ady12;
+!!BMx1&y13<>0:Ddy13;
+!!BMx1&y14<>0:Sdy14;
+
+!!SN:W^Arena_%Y1_Phase_2_Damage_Percent^/?y15;
+!!VRy15&y15<=0:S100;
+!!BMx1:U1/?y16 U2/?y17;
+!!VRy16:*y15:100;
+!!VRy17:*y15:100;
+!!VRy16&y16<1:S1;
+!!VRy17&y17<1:S1;
+!!BMx1:U1/y16 U2/y17;
+
+!!SN:W^Arena_%Y1_Phase_2_Spell_ID^/?y18;
+!!BMx1&y18>0:My18/99/3;
+
+*Visible and audible feedback for the phase change
+!!BMx1&i^battle_isVisible^:V50;         [Frenzy animation]
+!!VRz-9:S^BLOODLUS^;
+!!SN&i^battle_isVisible^:Pz-9;          [Play Bloodlust sound]
+!!VRz2:Ss^Arena_%Y1_Boss_Name^;
+!!SN:T^AC_Arena.Boss_Phase_2_Message^/?z1/^boss^/z2;
+!!BU&i^battle_isVisible^:Mz1;           [Show localized message in the battle log]
+
+
+****************************************************************************************************
+*Optional additional physical resistances for original Boss stacks.
+!?FU(OnStackToStackDamage)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!!FU|x1<0/x1>20/x2<21/x2>41:E;
+!!FU(Arena_Is_Original_Boss_Stack):Px2/?y90;
+!!FU&y90<>1:E;
+!!VRy2:S0;
+!!SN&x7=0:W^Arena_%Y1_Melee_Resistance^/?y2;
+!!SN&x7=1:W^Arena_%Y1_Ranged_Resistance^/?y2;
+!!FU&y2<=0:E;
+!!VRy2&y2>100:S100;
+!!VRy3:S100-y2;
+!!VRx4:*y3:100;
+!!VRx4&x4<0:S0;
+
+*Optional additional spell-damage resistance for original Boss stacks.
+!?MR1&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!!SN:W^Arena_%Y1_Spell_Damage_Resistance^/?y2; !!FU&y2<=0:E;
+!!MR:N?y3;
+!!FU(Arena_Is_Original_Boss_Stack):Py3/?y90;
+!!FU&y90<>1:E;
+!!VRy2&y2>100:S100;
+!!MR:F?y4; !!FU&y4<=0:E;
+!!VRy5:S100-y2;
+!!VRy4:*y5:100;
+!!MR:Fy4;
+
+
+****************************************************************************************************
+*Optional round aura. It activates once per configured round, regardless of the number of Boss stacks.
+!?FU(OnBattleRound)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1=0:E;
+!!SN:W^Arena_%Y1_Round_Aura_Spell_ID^/?y2;
+!!SN:W^Arena_%Y1_Round_Aura_Damage^/?y3;
+!!FU&y2<=0/y3<=0:E;
+!!SN:W^Arena_%Y1_Round_Aura_Interval^/?y4;
+!!SN:W^Arena_%Y1_Round_Aura_Start^/?y5;
+!!VRy4&y4<=0:S1;
+!!VRy5&y5<=0:S1;
+!!VRy6:Sv997+1;                         [convert the zero-based battle round to a displayed round number]
+!!FU&y6<y5:E;
+!!VRy7:Sy6-y5;
+!!VRy7:%y4;
+!!FU&y7<>0:E;
+
+!!VRy20:S-1;
+!!re i/21/41;
+  !!FU(Arena_Is_Original_Boss_Stack):Pi/?y90;
+  !!BMi:T?y8 N?y9 I?y10;
+  !!VRy20&y20=-1/y90=1/y8>=0/y9>0/y10=1:Si;
+!!en;
+!!FU&y20=-1:E;                          [do not activate the aura after all original Boss stacks are dead]
+
+!!SN:W^Arena_%Y1_Round_Aura_Spell_Duration^/?y11;
+!!SN:W^Arena_%Y1_Round_Aura_Spell_Mastery^/?y12;
+!!VRy11&y11<=0:S1;
+!!VRy12&y12<=0:S3;
+!!VRy12&y12>3:S3;
+!!VRy13:S0;
+!!FU(Arena_Apply_Boss_Effect_Difficulty)&y3>0:Py3/?y13;
+!!re i/0/20;
+  !!BMi:T?y14 N?y15 I?y16;
+  !!if&y14>=0/y15>0/y16=0;
+    !!BMi&y2>0:My2/y11/y12;
+    !!BMi&y13>0:Ky13;
+  !!en;
+!!en;
+
+
+****************************************************************************************************
+*Return whether a battlefield position has a living enemy stack on an adjacent hex.
+*Used by ranged Arena Boss mechanics; Arena defenders are expected on side 1.
+!?FU(Arena_Boss_Has_Adjacent_Enemy);
+*x1 = battlefield position, x2 = result
+!!VRy80:Sx1;
+!!VRx2:S0;
+!!re i/0/5;
+  !!FU(Arena_Calc_neighbouring_hex):Py80/i/?y70;
+  !!if&y70>=0/y70<=186;
+    !!BU:Ey70/?y71;
+    !!if&y71>=0/y71<=20;
+      !!BMy71:T?y72 N?y73 I?y74;
+      !!if&y72>=0/y73>0/y74=0;
+        !!VRx2:S1;
+        !!br;
+      !!en;
+    !!en;
+  !!en;
+!!en;
+
+
+!?FU(Arena_Calc_neighbouring_hex);      [Funktion to calculate neighbouring Hex cells]
+!!UN:C6919200/4/?y1;                    [Y1 = combatManager]
+!!VRx2:*2;
+!!VRx1:*12+ y1+ 78952+ x2;
+!!UN:Cx1/2/?x3;

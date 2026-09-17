@@ -15,17 +15,17 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P12/?y80/?y81;
 !!VRy90:Si^Arena_12_Reward_1_Artifacts_Random^;
 
 !!VRs^Arena_12_CB_Name^:S^Arena 12^;
 !!VRs^Arena_12_Description^:S^{~r}Arena 12 {~>cprsmall.def:42}{~}
 
-Difficulty: {~r}Hard{~}
-Cost: 10000{~>SMALRES.def:6}
-Reward: Town Portal spell and 2 Attack
-Min Level requirement: 35
-Max Level requirement: 55
-Description: A fight vs 8k Giants^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | Town Portal | +2 Attack
+Challenge: Fight %Y10 Giants.
+Rules: Hero levels 35-55.
+Tip: Close the distance quickly or use protection from ranged attacks.
+^; (Set the text that shows when you visit the CB)
 
 
 ******Battlefield********
@@ -122,8 +122,6 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!VRi^Arena_12_Reward_Scales^:S0;            (0=no, write the value in percent that the reward should scale per week. For example 10% in week 4 would would mean reward 140:100 increase of Res, or Gold, or Spell Points or Experience. Does not work with creatures or artifacts.)
 !!VRi^Arena_12_Reward_Scales_with_size^:S0;  (1=yes, 0=no, Requires Arena_12_Different_Size to be active, when defeating bigger CB the rewards are increased. Level 1=1 (your settings), Level 2=*1,5, Level 3=*2, Level 4=*3 increase. Artifacts might increase in class for level 3 and 4. But never to relicts.)
-
-
 
 
 

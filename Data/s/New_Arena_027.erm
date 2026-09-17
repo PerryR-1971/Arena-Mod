@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P27/?y80/?y81;
 
 !!VRs^Arena_27_CB_Name^:S^{~>cprsmall.def:28}^;
 
@@ -26,11 +27,10 @@ Parameter Settings:
 {~>monprt44.def:28} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 100000{~>SMALRES.def:6} and 1000000{~>ExpSmall.def:0} +2 to all primary stats, +20% Water Spell damage, +10 Magic Strength for Water Spells.
-
-Description: Defeat Wromthrax in his cave. Has a strong water spell which slows units. 
-Tipp: Use Water Resistance. Try to not get to much slowed.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +2 to all primary stats, +20% Water spell damage, +10 Water Magic Strength.
+Challenge: Regenerates, acts twice and uses slowing Water spells.
+Tip: Bring Water Resistance and fast units.^; 
 
 
 ******Battlefield********
@@ -61,10 +61,12 @@ Set the stats of the boss here
 !!VRi^Arena_27_Boss_Damage^:S10000;
 !!VRi^Arena_27_Boss_Health^:S80000;
 !!VRi^Arena_27_Boss_Speed^:S20;
+!!VRi^Arena_27_Danger_Value^:S9000000;     (Base progression 8000000 + 1000000 for a particularly strong Arena.)
 !!VRs^Arena_27_Boss_Name^:S^Wromthrax^;
 !!VRs^Arena_27_Boss_Description^:S^Water attack that slows
 10% Regeneration
-Immune to Magic^;
+Immune to Magic
+Phase 2 at 50% health: +30% stats and Bless^;
 
 
 ******Guards********
@@ -112,7 +114,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_27_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_27_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_27_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_27_Reward_Gold^:S-1;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_27_Reward_Gold^:S350000;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_27_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_27_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -121,7 +123,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_27_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_27_Reward_Experience^:S0;       (The amount of Experience 1-9999999)
+!!VRi^Arena_27_Reward_Experience^:S700000;        (The amount of Experience 1-9999999)
 
 !!VRi^Arena_27_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_27_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -150,13 +152,19 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 
 !!VRi^Arena_27_Cast_Spell_ID^:S16;      [Set to Ice Bolt cast]
 !!VRi^Arena_27_Cast_Spells^:S1;         [Set amount of cast] 16 Ice Bolt]
-!!SN:W^Arena_27_Cast_Spell_Damage^/10000; [Set the damage the spell should cause]
+!!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+!!SN:W^Arena_27_Cast_Spell_Damage^/y90; [Set difficulty-scaled spell damage]
 
 !!VRi^Arena_27_Act_Twice^:S1;           [acts twice]
 !!VRi^Arena_27_Regeneration_Value^:S10; [Regeneration in percent of HP per turn]
 
 !!SN:W^Arena_27_BuffSpell_ID_1^/46;     [set spell 1 ID which should be applied at battle start on stack 21]
 !!SN:W^Arena_27_BuffSpell_Power_1^/10;  [set spell power/effect of that spell, can have different meaning]
+
+!!SN:W^Arena_27_Phase_2_HP_Percent^/50;      [Activate phase 2 at 50% health]
+!!SN:W^Arena_27_Phase_2_All_Stats_Percent^/130; [Increase current combat stats to 130%]
+!!SN:W^Arena_27_Phase_2_Spell_ID^/41;        [Bless]
+!!FU(Arena_Set_Boss_Battle_Def):P27/^ar27.def^; [custom appearance for Wromthrax]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -190,7 +198,8 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>27:E; [Exit if it is not Arena Fight]
 !!if&x1=1/x2=0;                         [if defender side]
   !!SS20:E3/?y30 P?y31;                 [temp save effect and power]
-  !!SS20:E3/10000 P0;                   [temp set spell damage]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+  !!SS20:E3/y90 P0;                     [temp set difficulty-scaled spell damage]
     !!VRy10:S0R186;                     [Generate Random Battlefield Position]
     !!BM21:C20/y10/3/3/0;               [cast Ice Ring in the First Battle Round]
     !!VRy10:S0R186;                     [Generate Random Battlefield Position]

@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P30/?y80/?y81;
 
 !!VRs^Arena_30_CB_Name^:S^{~>cprsmall.def:134}^;
 
@@ -26,9 +27,10 @@ Parameter Settings:
 {~>monprt44.def:134} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 100000{~>SMALRES.def:6} and 2000000{~>ExpSmall.def:0} +2 to all primary stats, +10% HP, +1 speed during combat
-Description: Defeat the Mega Dragon, he is the thoughest enemy you can face in the Arena. So be prepared!^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +2 to all primary stats, +10% HP, +1 combat Speed, +10 Commander kill count, +10 Mithril.
+Challenge: Acts twice, resists damage and summons Ice Elementals.
+Tip: Bring your strongest army and protect irreplaceable stacks.^; 
 
 
 ******Battlefield********
@@ -59,12 +61,14 @@ Set the stats of the boss here
 !!VRi^Arena_30_Boss_Damage^:S20000;
 !!VRi^Arena_30_Boss_Health^:S1000000;
 !!VRi^Arena_30_Boss_Speed^:S15;
+!!VRi^Arena_30_Danger_Value^:S20000000;    (Fixed final Arena benchmark on Warrior difficulty.)
 !!VRs^Arena_30_Boss_Name^:S^Mega Dragon^;
 !!VRs^Arena_30_Boss_Description^:S^Energy Attack
 Can eradicate its target
 Acts twice
 Physical resistance
-Sometimes invisible^;
+Sometimes invisible
+Phase 2 at 50% health: +30% stats and Prayer^;
 
 
 ******Guards********
@@ -112,7 +116,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_30_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_30_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_30_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_30_Reward_Gold^:S100000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_30_Reward_Gold^:S500000;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_30_Reward_Mithril^:S10;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_30_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -121,7 +125,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_30_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_30_Reward_Experience^:S2000000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_30_Reward_Experience^:S1000000;       (The amount of Experience 1-9999999)
 
 !!VRi^Arena_30_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_30_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -151,8 +155,14 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_30_Act_Twice^/1; Number of actings per round
 !!SN:W^Arena_30_Cast_Spells^/1; Number of casts on target before any attack
 !!SN:W^Arena_30_Cast_Spell_ID^/17; Spell ID that should be cast
-!!SN:W^Arena_30_Cast_Spell_Damage^/10000; [Set the damage the spell should cause]
+!!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+!!SN:W^Arena_30_Cast_Spell_Damage^/y90; [Set difficulty-scaled spell damage]
 17  Lightning Bolt 
+
+!!SN:W^Arena_30_Phase_2_HP_Percent^/50;      [Activate phase 2 at 50% health]
+!!SN:W^Arena_30_Phase_2_All_Stats_Percent^/130; [Increase current combat stats to 130%]
+!!SN:W^Arena_30_Phase_2_Spell_ID^/48;        [Prayer]
+!!FU(Arena_Set_Boss_Battle_Def):P30/^ar30.def^; [custom appearance for the Mega Dragon]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -162,14 +172,15 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!en;
 
 
-*5000 flat damage reduction
+*Difficulty-scaled flat damage reduction (5000 on Warrior)
 !?FU(OnStackToStackDamage)&i^Arena_Fight^; 
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>30:E; [Exit if it is not Arena Fight]
 !!if&x1>=0/x1<=41;                      [if any valid battlestack]
 !!if&x2>=0/x2<=41;                      [if any valid battlestack]  
   !!if&x2=21;                           [If Arena Boss]
   !!if|x7=0/x7=1;                       [If melee or range attack]
-    !!VRx4:-5000;                       [add new damage]
+    !!FU(Arena_Apply_Boss_Effect_Difficulty):P5000/?y90;
+    !!VRx4:-y90;                        [difficulty-scaled flat damage reduction]
     !!VRx4&x4<0:S0;                     [value cannot be negative]
   !!en;
   !!en;
@@ -188,15 +199,17 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!BMy40:P?y50;                          [get position of stack]
 !!SN:W^Arena_30_Once_Flag^/?y20;
 !!SS19:E3/?y30 P?y31;                   [temp save effect and power]
-!!SS19:E3/10000 P0;                     [temp set spell damage]
+!!FU(Arena_Apply_Boss_Effect_Difficulty):P10000/?y90;
+!!SS19:E3/y90 P0;                       [temp set difficulty-scaled spell damage]
 !!BM21|v997=0/y20=1:C19/y50/3/3/1;      [cast Chain Lightning in the First Battle Round or when he resurrected]
 !!SS19:E3/y30 Py31;                     [restore spell values]
 !!SN&y20=1:W^Arena_30_Once_Flag^/0;     [reset flag]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P1000/?y90;
   !!re i/0/5;                           [loop around the creatures in cirlce 0-6 positions]
     !!if|v997=1/v997=4/v997=7/v997=10;
-      !!FU(ACM_Calc_neighbouring_hex_2):Py71/i/?y70; [Pass position and return first neighbouring hex field]
+      !!FU(Arena_Calc_neighbouring_hex):Py71/i/?y70; [Pass position and return first neighbouring hex field]
       !!FU(WOG_GetValidPositionForStack):Py70/57/1/?y72/0; [check if this position is free]
-      !!BU&y72>-1:S123/1000/y72/1/-1/1;    [Summon 123 Ice Elemental]
+      !!BU&y72>-1:S123/y90/y72/1/-1/1;     [Summon difficulty-scaled Ice Elementals]
     !!en;
   !!en;
 !!en;

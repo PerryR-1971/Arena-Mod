@@ -18,6 +18,7 @@ Parameter Settings:
 154 Blood Dragon
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P28/?y80/?y81;
 
 !!VRs^Arena_28_CB_Name^:S^{~>cprsmall.def:156}^;
 
@@ -26,9 +27,10 @@ Parameter Settings:
 {~>monprt44.def:156} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 1000000{~>SMALRES.def:6} and 2000000{~>ExpSmall.def:0}
-Description: Defeat the Undead Dragon. A powerful dragon with leech attack and Fear ability.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +1 to all class points, +5% Magic Pierce, +1 to all primary stats, +5 Mithril.
+Challenge: Acts twice and attacks with Leech, Fear and Curse effects.
+Tip: Keep important stacks protected from its disabling effects.^; 
 
 
 ******Battlefield********
@@ -59,12 +61,14 @@ Set the stats of the boss here
 !!VRi^Arena_28_Boss_Damage^:S10000;
 !!VRi^Arena_28_Boss_Health^:S80000;
 !!VRi^Arena_28_Boss_Speed^:S15;
+!!VRi^Arena_28_Danger_Value^:S10000000;    (Base progression 9000000 + 1000000 for a particularly strong Arena.)
 !!VRs^Arena_28_Boss_Name^:S^The Bone Drake^;
 !!VRs^Arena_28_Boss_Description^:S^Leech attack
 Fear ability
 Curses all enemies
 Acts twice
-Magic Resistance 25%^;
+Magic Resistance 25%
+Phase 2 at 50% health: +30% stats and Bloodlust^;
 
 ******Guards********
 Set the guards and the number of each slot.
@@ -111,7 +115,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_28_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_28_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_28_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_28_Reward_Gold^:S100000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_28_Reward_Gold^:S400000;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_28_Reward_Mithril^:S5;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_28_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -120,7 +124,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_28_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_28_Reward_Experience^:S1000000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_28_Reward_Experience^:S800000;        (The amount of Experience 1-9999999)
 
 !!VRi^Arena_28_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_28_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -148,6 +152,11 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!VRs^Arena_28_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_28_Custom_Sound is set active)
 
 !!VRi^Arena_28_Act_Twice^:S1;           [acts twice]
+
+!!SN:W^Arena_28_Phase_2_HP_Percent^/50;      [Activate phase 2 at 50% health]
+!!SN:W^Arena_28_Phase_2_All_Stats_Percent^/130; [Increase current combat stats to 130%]
+!!SN:W^Arena_28_Phase_2_Spell_ID^/43;        [Bloodlust]
+!!FU(Arena_Set_Boss_Battle_Def):P28/^ar28.def^; [custom appearance for the Bone Drake]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;

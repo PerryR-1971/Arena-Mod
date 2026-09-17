@@ -1,0 +1,269 @@
+ZVSE2
+****************************************************************************************************
+
+
+                    Arena Config Window
+
+
+****************************************************************************************************
+* Public defaults: Lang/configuration.json may override these values.
+* Saved values from Runtime/arena config.ini take final precedence.
+!#VRi^Arena_Normal_Difficulty^:S2;
+!#VRi^Arena_Boss_Difficulty^:S2;
+!#VRi^Arena_Config_Loaded^:S(FALSE);
+
+!?FU(Arena_LoadJsonDefaults);
+!!FU(LoadIntGlobalsFromJson):P^arena_mod.settings.^/^Arena_^/^Config_Loaded^;
+!!FU(LoadIntGlobalsFromJson)&i^Arena_Config_Loaded^:P^arena_mod.settings.^/^Arena_^/
+  ^Normal_Difficulty^/^Boss_Difficulty^;
+
+!#FU(Arena_LoadJsonDefaults):P;
+
+
+!?FU(Configure_Arena_mod);              [Open the Arena configuration]
+
+!!DL171:N^Arena_Set.txt^;               [Parse dialogue]
+!!FU(Arena_LoadOptionsFromIni):P;       [Load the persistent Runtime setting]
+
+* Alternate between the light MM7 style and the current dark style whenever the window opens
+!!SN:W^Arena_Config_Next_Light_Style^/?y2;
+!!VRy2&y2<>1:S0;
+!!VRy3:S0;
+!!if&y2=0;
+  !!VRy3:S1;
+  !!SN:W^Arena_Config_Next_Light_Style^/1;
+!!el;
+  !!SN:W^Arena_Config_Next_Light_Style^/0;
+!!en;
+!!SN:W^Arena_Config_Active_Light_Style^/y3;
+
+!!VRz90:S^am_bg.pcx^;
+!!VRz91:S^am_ok.pcx^;
+!!VRz92:S^am_exit.pcx^;
+!!VRz90&y3=1:S^am_bgl.pcx^;
+!!VRz91&y3=1:S^am_lok.pcx^;
+!!VRz92&y3=1:S^am_lex.pcx^;
+!!DL171:A100/11/z90/1 A30722/11/z91/1 A30721/11/z92/1;
+
+!!SN:T^Arena_Config.Title^/?z1;
+!!SN:T^Arena_Config.Description^/?z2;
+!!SN:T^Arena_Config.Confirm_Button^/?z70;
+!!SN:T^Arena_Config.Cancel_Button^/?z71;
+!!DL171:A1/3/z1/1 A2/3/z2/1 A70/3/z70/1 A71/3/z71/1;
+
+!!SN:T^Arena_Config.Standard_Tab_Hint^/?z45;
+!!SN:T^Arena_Config.Boss_Tab_Hint^/?z46;
+!!DL171:H10/45 H11/46;
+
+!!SN:T^Arena_Config.Cancel_Hint^/?z43;
+!!SN:T^Arena_Config.Confirm_Hint^/?z44;
+!!DL171:H30721/43 H71/43 H30722/44 H70/44;
+
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!SN&y1<1:W^Arena_Normal_Difficulty^/2;
+!!SN&y1>4:W^Arena_Normal_Difficulty^/2;
+!!SN:W^Arena_Boss_Difficulty^/?y1;
+!!SN&y1<1:W^Arena_Boss_Difficulty^/2;
+!!SN&y1>4:W^Arena_Boss_Difficulty^/2;
+
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!SN:W^Arena_Config_Original_Normal_Difficulty^/y1;
+!!SN:W^Arena_Boss_Difficulty^/?y1;
+!!SN:W^Arena_Config_Original_Boss_Difficulty^/y1;
+!!SN:W^Arena_Config_Active_Page^/1;
+
+!!FU(Arena_Config_Refresh):P;
+!!DL171:S1;
+
+
+* The difficulty option fields are selection buttons
+!?DL&v998=171/v999>=40/v999<=43/v1000=13;
+!!SN:P^Button.wav^;
+!!VRy1:Sv999;
+!!VRy1:-39;
+!!SN:W^Arena_Config_Active_Page^/?y2;
+!!SN&y2=1:W^Arena_Normal_Difficulty^/y1;
+!!SN&y2=2:W^Arena_Boss_Difficulty^/y1;
+!!FU(Arena_Config_Refresh):P;
+
+
+* Clicking a difficulty label selects the same option
+!?DL&v998=171/v999>=20/v999<=23/v1000=13;
+!!SN:P^Button.wav^;
+!!VRy1:Sv999;
+!!VRy1:-19;
+!!SN:W^Arena_Config_Active_Page^/?y2;
+!!SN&y2=1:W^Arena_Normal_Difficulty^/y1;
+!!SN&y2=2:W^Arena_Boss_Difficulty^/y1;
+!!FU(Arena_Config_Refresh):P;
+
+
+* Switch between Standard Arenas 1-15 and Boss Arenas 16-30
+!?DL&v998=171/v999>=10/v999<=11/v1000=13;
+!!SN:P^Button.wav^;
+!!VRy1:Sv999;
+!!VRy1:-9;
+!!SN:W^Arena_Config_Active_Page^/y1;
+!!FU(Arena_Config_Refresh):P;
+
+
+* Refresh the selected rank and its visual highlight
+!?FU(Arena_Config_Refresh);
+!!SN:W^Arena_Config_Active_Page^/?y10;
+!!VRy10&y10<>2:S1;
+!!SN:W^Arena_Config_Active_Page^/y10;
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!SN&y10=2:W^Arena_Boss_Difficulty^/?y1;
+
+* Refresh page tabs and the page-specific description
+!!SN:T^Arena_Config.Standard_Tab^/?z10;
+!!SN:T^Arena_Config.Boss_Tab^/?z11;
+!!SN&y10=1:T^Arena_Config.Standard_Tab_Selected^/?z10;
+!!SN&y10=2:T^Arena_Config.Boss_Tab_Selected^/?z11;
+!!SN&y10=1:T^Arena_Config.Standard_Description^/?z2;
+!!SN&y10=2:T^Arena_Config.Boss_Description^/?z2;
+!!DL171:A10/3/z10/1 A11/3/z11/1 A2/3/z2/1;
+
+* Load the normal portrait or its highlighted selection variant
+!!VRz50:S^am_pn.pcx^;
+!!VRz51:S^am_wn.pcx^;
+!!VRz52:S^am_bn.pcx^;
+!!VRz53:S^am_cn.pcx^;
+!!SN:W^Arena_Config_Active_Light_Style^/?y2;
+!!VRz50&y2=1:S^am_lpn.pcx^;
+!!VRz51&y2=1:S^am_lwn.pcx^;
+!!VRz52&y2=1:S^am_lbn.pcx^;
+!!VRz53&y2=1:S^am_lcn.pcx^;
+!!VRz50&y1=1:S^am_ps.pcx^;
+!!VRz51&y1=2:S^am_ws.pcx^;
+!!VRz52&y1=3:S^am_bs.pcx^;
+!!VRz53&y1=4:S^am_cs.pcx^;
+!!VRz50&y1=1/y2=1:S^am_lps.pcx^;
+!!VRz51&y1=2/y2=1:S^am_lws.pcx^;
+!!VRz52&y1=3/y2=1:S^am_lbs.pcx^;
+!!VRz53&y1=4/y2=1:S^am_lcs.pcx^;
+!!DL171:A40/11/z50/1 A41/11/z51/1 A42/11/z52/1 A43/11/z53/1;
+
+!!SN:T^Arena_Config.Peasant_Label^/?z20;
+!!SN:T^Arena_Config.Warrior_Label^/?z21;
+!!SN:T^Arena_Config.Berserk_Label^/?z22;
+!!SN:T^Arena_Config.Chieftain_Label^/?z23;
+!!SN&y1=1:T^Arena_Config.Peasant_Selected^/?z20;
+!!SN&y1=2:T^Arena_Config.Warrior_Selected^/?z21;
+!!SN&y1=3:T^Arena_Config.Berserk_Selected^/?z22;
+!!SN&y1=4:T^Arena_Config.Chieftain_Selected^/?z23;
+!!DL171:A20/3/z20/1 A21/3/z21/1 A22/3/z22/1 A23/3/z23/1;
+
+!!SN&y1=1:T^Arena_Config.Peasant_Label^/?z31;
+!!SN&y1=2:T^Arena_Config.Warrior_Label^/?z31;
+!!SN&y1=3:T^Arena_Config.Berserk_Label^/?z31;
+!!SN&y1=4:T^Arena_Config.Chieftain_Label^/?z31;
+!!SN&y10=1:T^Arena_Config.Current_Standard^/?z30/^difficulty^/^%Z31^;
+!!SN&y10=2:T^Arena_Config.Current_Boss^/?z30/^difficulty^/^%Z31^;
+!!DL171:A30/3/z30/1;
+
+* Refresh page-specific hints
+!!SN&y10=1:T^Arena_Config.Standard_Peasant_Hint^/?z60;
+!!SN&y10=1:T^Arena_Config.Standard_Warrior_Hint^/?z61;
+!!SN&y10=1:T^Arena_Config.Standard_Berserk_Hint^/?z62;
+!!SN&y10=1:T^Arena_Config.Standard_Chieftain_Hint^/?z63;
+!!SN&y10=1:T^Arena_Config.Standard_Current_Hint^/?z64;
+!!SN&y10=2:T^Arena_Config.Peasant_Hint^/?z60;
+!!SN&y10=2:T^Arena_Config.Warrior_Hint^/?z61;
+!!SN&y10=2:T^Arena_Config.Berserk_Hint^/?z62;
+!!SN&y10=2:T^Arena_Config.Chieftain_Hint^/?z63;
+!!SN&y10=2:T^Arena_Config.Current_Hint^/?z64;
+!!DL171:H20/60 H40/60;
+!!DL171:H21/61 H41/61;
+!!DL171:H22/62 H42/62;
+!!DL171:H23/63 H43/63;
+!!DL171:H30/64;
+
+
+* Right-click information
+!?DL&v998=171/v1000=14;
+!!SN:W^Arena_Config_Active_Page^/?y1;
+!!if&y1=1;
+  !!if|v999=20/v999=40;
+    !!IF:M0/4/^%T(Arena_Config.Standard_Peasant_Info)^;
+  !!en;
+  !!if|v999=21/v999=41;
+    !!IF:M0/4/^%T(Arena_Config.Standard_Warrior_Info)^;
+  !!en;
+  !!if|v999=22/v999=42;
+    !!IF:M0/4/^%T(Arena_Config.Standard_Berserk_Info)^;
+  !!en;
+  !!if|v999=23/v999=43;
+    !!IF:M0/4/^%T(Arena_Config.Standard_Chieftain_Info)^;
+  !!en;
+!!el;
+  !!if|v999=20/v999=40;
+    !!IF:M0/4/^%T(Arena_Config.Peasant_Info)^;
+  !!en;
+  !!if|v999=21/v999=41;
+    !!IF:M0/4/^%T(Arena_Config.Warrior_Info)^;
+  !!en;
+  !!if|v999=22/v999=42;
+    !!IF:M0/4/^%T(Arena_Config.Berserk_Info)^;
+  !!en;
+  !!if|v999=23/v999=43;
+    !!IF:M0/4/^%T(Arena_Config.Chieftain_Info)^;
+  !!en;
+!!en;
+
+
+* Cancel: restore the value from before opening the window
+!?DL&v998=171/v999=30721/v1000=13;
+!!FU(Arena_Config_Cancel):P;
+
+!?DL&v998=171/v999=71/v1000=13;
+!!FU(Arena_Config_Cancel):P;
+
+!?FU(Arena_Config_Cancel);
+!!SN:W^Arena_Config_Original_Normal_Difficulty^/?y1;
+!!SN:W^Arena_Normal_Difficulty^/y1;
+!!SN:W^Arena_Config_Original_Boss_Difficulty^/?y1;
+!!SN:W^Arena_Boss_Difficulty^/y1;
+!!DL171:C1;
+
+
+* Confirm: keep the selected value
+!?DL&v998=171/v999=30722/v1000=13;
+!!FU(Arena_Config_Confirm):P;
+
+!?DL&v998=171/v999=70/v1000=13;
+!!FU(Arena_Config_Confirm):P;
+
+!?FU(Arena_Config_Confirm);
+!!FU(Arena_SaveOptionsToIni):P;
+!!DL171:C1;
+
+
+****************************************************************************************************
+* Persistent Runtime configuration
+****************************************************************************************************
+!?FU(Arena_LoadOptionsFromIni);
+!!VR(filePath:z):S^Runtime/arena config.ini^;
+!!FU(ReadIniInts):P(filePath)/^Arena^/
+  ^Arena_Normal_Difficulty^/?i^Arena_Normal_Difficulty^/i^Arena_Normal_Difficulty^/
+  ^Arena_Boss_Difficulty^/?i^Arena_Boss_Difficulty^/i^Arena_Boss_Difficulty^;
+
+!!SN:W^Arena_Normal_Difficulty^/?y1;
+!!SN&y1<1:W^Arena_Normal_Difficulty^/2;
+!!SN&y1>4:W^Arena_Normal_Difficulty^/2;
+!!SN:W^Arena_Boss_Difficulty^/?y1;
+!!SN&y1<1:W^Arena_Boss_Difficulty^/2;
+!!SN&y1>4:W^Arena_Boss_Difficulty^/2;
+
+
+!?FU(Arena_SaveOptionsToIni);
+!!VR(filePath:z):S^Runtime/arena config.ini^;
+!!FU(WriteIniInts):P(filePath)/^Arena^/
+  ^Arena_Normal_Difficulty^/i^Arena_Normal_Difficulty^/
+  ^Arena_Boss_Difficulty^/i^Arena_Boss_Difficulty^/;
+!!FU(SaveIni):P(filePath);
+
+
+* Load the global setting when ERA initializes the scripts
+!?PI;
+!!FU(Arena_LoadOptionsFromIni):P;

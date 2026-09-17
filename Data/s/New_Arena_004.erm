@@ -22,17 +22,16 @@ Parameter Settings:
 ******Arena Name and Description********
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P4/?y80/?y81;
 
 !!VRs^Arena_4_CB_Name^:S^Arena 4^;
 !!VRs^Arena_4_Description^:S^{~r}Arena 4 {~>cprsmall.def:75}{~}
 
-Difficulty: {~green}Easy{~}
-Reward: 10000{~>SMALRES.def:6} and 2 Knowledge
-
-Starts scaling after 10 weeks.
-An easy fight versus %Y10 Harpy Hag. Clear early for some Knowledge.
-
-Specials: None^; (Set the text that shows when you visit the CB)
+Reward: %Y80{~>SMALRES.def:6} | +2 Knowledge
+Challenge: Fight %Y10 Harpy Hags.
+Rules: Maximum hero level 40.
+Tip: Protect vulnerable stacks from their no-retaliation attacks.
+^; (Set the text that shows when you visit the CB)
 
 
 !?PI;

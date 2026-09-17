@@ -18,18 +18,19 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P18/?y80/?y81;
 
 !!VRs^Arena_18_CB_Name^:S^{~>cprsmall.def:118}^;
 
-!!VRs^Arena_18_Description^:S^{~r}Strange looking Gold Golem (M&M7){~}
+!!VRs^Arena_18_Description^:S^{~r}Strange-looking Gold Golem (M&M7){~}
 
 {~>monprt44.def:118} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 50000{~>SMALRES.def:6} and 50000{~>ExpSmall.def:0} +1 Defense, +50 damage reduction, +15% commander health
-Description: A strange looking Golem with flat damage absorb and high defense. He acts one additional time for each new battleround, so you better kill him fast. 
-^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +1 Defense, +50 damage reduction, +15% Commander Health.
+Challenge: Flat damage absorption and one additional action each round.
+Tip: Concentrate your damage and defeat it before the later rounds.^; 
 
 
 ******Battlefield********
@@ -58,12 +59,13 @@ Set the stats of the boss here
 !!VRi^Arena_18_Boss_Attack^:S40;
 !!VRi^Arena_18_Boss_Defense^:S40;
 !!VRi^Arena_18_Boss_Shots^:S0;
-!!VRi^Arena_18_Boss_Damage^:S15000;
+!!VRi^Arena_18_Boss_Damage^:S10000;
 !!VRi^Arena_18_Boss_Health^:S30000;
 !!VRi^Arena_18_Boss_Speed^:S13;
-!!VRs^Arena_18_Boss_Name^:S^Strange looking Gold Golem^;
-!!VRs^Arena_18_Boss_Description^:S^2000 flat damage absorb
-+1 turn per battleround 
+!!VRi^Arena_18_Danger_Value^:S3500000;     (Base progression 2500000 + 1000000 for a particularly strong Arena.)
+!!VRs^Arena_18_Boss_Name^:S^Strange-looking Gold Golem^;
+!!VRs^Arena_18_Boss_Description^:S^Difficulty-scaled flat damage absorb
++1 turn per battle round 
 No Enemy Retaliation
 Magic Resistance 25%
 Golem Resistance^;
@@ -123,7 +125,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_18_Reward_1_Creatures_Number^:S-1;
 Random Creatures can also be generated in a certain range x1-x2 and faction, for example on Castle Creatures (0-14). If you want to use this option go to the reward section Line ~375 and enable the code. 
 
-!!VRi^Arena_18_Reward_Experience^:S50000;       (The amount of Experience 1-9999999)
+!!VRi^Arena_18_Reward_Experience^:S100000;      (The amount of Experience 1-9999999)
 
 !!VRi^Arena_18_Reward_1_Artifacts_Class^:S-2;   (-2=disabled, #-(set) artifact level (-1=random, 1=no class, 2=treasure, 4=minor, 8=major, 16=relic))
 !!VRi^Arena_18_Reward_1_Artifacts_Specific^:S-1; (0-999 This setting will overwrite the random reward. Also works with emerald)
@@ -221,7 +223,8 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!if&x2>=0/x2<=41;                      [if any valid battlestack]  
   !!if&x2=21;                           [If Arena Boss]
   !!if|x7=0/x7=1;                       [If melee or range attack]
-    !!VRx4:-2000;                       [add new damage]
+    !!FU(Arena_Apply_Boss_Effect_Difficulty):P2000/?y90;
+    !!VRx4:-y90;                        [difficulty-scaled flat damage absorb]
     !!VRx4&x4<0:S0;                     [value cannot be negative]
   !!en;
   !!en;

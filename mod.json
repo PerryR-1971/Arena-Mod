@@ -1,38 +1,27 @@
 {
-	"caption": {
-		"Cn_Simp": "",
-		"en_US": "Arena Mod",
-		"ru_RU": "",
-		"ua_UA": ""
-	},
-	"description": {
-		"full": {
-			"Cn_Simp": "",
-			"en_US": "readme.txt",
-			"ru_RU": "",
-			"ua_UA": ""
-		},
-		"short": {
-			"Cn_Simp": "",
-			"en_US": "Arena Mod Beta v0.8\r\n\r\nFight in the Arena! \r\nEither use the GEM townbutton or right mouse click in your town on the market to access the arena.",
-			"ru_RU": "",
-			"ua_UA": ""
-		}
-	},
-	"author": "PerryR",
-	"homepage": "",
-	"icon": {
-		"file": "arena2.ico",
-		"index": 0
-	},
-	"mod_version": "0.8",
-	"priority": 0,
-	"compatibility": {
-		"class": "default",
-		"entries": {}
-	},
-	"platform": "era",
-	"info_version": "1.0",
-	"plugins": {},
-	"category": "gameplay"
+  "name": {
+    "en": "Arena Mod"
+  },
+  "description": {
+    "en": "readme.txt"
+  },
+  "author": "PerryR",
+  "homepage": "https://github.com/PerryR-1971/Arena-Mod",
+  "support": "https://discord.gg/hCTMfVq6w5",
+  "icon": "arena2.ico",
+  "version": "1.1",
+  "category": "gameplay",
+  "compatibility": {
+    "requires": [
+      "WoG",
+      "Game Enhancement Mod"
+    ],
+    "load_after": [
+      "WoG",
+      "Game Enhancement Mod",
+      "Advanced Classes Mod",
+      "Difficulty Mod"
+    ],
+    "incompatible": []
+  }
 }

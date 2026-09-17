@@ -18,6 +18,7 @@ Parameter Settings:
 
 !?FU(Set_Arena_Descriptions);
 !!FU(Arena_Calc_Guard_Numbers):Px1/?y10;
+!!FU(Arena_Get_Scaled_Rewards):P21/?y80/?y81;
 
 !!VRs^Arena_21_CB_Name^:S^{~>cprsmall.def:37}^;
 
@@ -26,10 +27,10 @@ Parameter Settings:
 {~>monprt44.def:37} 
 
 
-Difficulty: {~red}Bossbattle{~}
-Reward: 100000{~>SMALRES.def:6} and 200000{~>ExpSmall.def:0} +2 attack, +1 Spell Upgrade, +5% spell damage
-Description: A casting range enemy. Try to force him in melee attack range to reduce his advantage.
-Tipp: Killing his clones will heal the Mage.^; 
+Reward: %Y80{~>SMALRES.def:6} | %Y81{~>ExpSmall.def:0}
+Bonus: +2 Attack, +1 Spell Upgrade, +5% spell damage.
+Challenge: A ranged spellcaster who creates two clones each round and fires multiple shots.
+Tip: Adjacent enemies force Robert to teleport before he attacks.^; 
 
 
 ******Battlefield********
@@ -61,11 +62,12 @@ Set the stats of the boss here
 !!VRi^Arena_21_Boss_Damage^:S5000;
 !!VRi^Arena_21_Boss_Health^:S60000;
 !!VRi^Arena_21_Boss_Speed^:S15;
+!!VRi^Arena_21_Danger_Value^:S5000000;     (Base progression 4000000 + 1000000 for a particularly strong Arena.)
 !!VRs^Arena_21_Boss_Name^:S^Robert the Wise^;
-!!VRs^Arena_21_Boss_Description^:S^Multi Rangeattack
+!!VRs^Arena_21_Boss_Description^:S^Multiple ranged attacks
 Exploding projectiles
-Can teleport
-Summons clones
+Teleports away from adjacent enemies
+Summons two clones each round
 No Enemy Retaliation
 Magic Resistance 25%^;
 
@@ -115,7 +117,7 @@ You can choose several rewards. The rewards are processed one after the other.
 !!VRi^Arena_21_Reward_Sulfur^:S-1;           (Write here the amount of Sulfur 1-1000000)
 !!VRi^Arena_21_Reward_Crystal^:S-1;          (Write here the amount of Crystal 1-1000000)
 !!VRi^Arena_21_Reward_Gems^:S-1;             (Write here the amount of Gems 1-1000000)
-!!VRi^Arena_21_Reward_Gold^:S10000;             (Write here the amount of Gold 1-1000000)
+!!VRi^Arena_21_Reward_Gold^:S100000;             (Write here the amount of Gold 1-1000000)
 !!VRi^Arena_21_Reward_Mithril^:S-1;          (Write here the amount of Mithril 1-1000000)
 
 !!VRi^Arena_21_Reward_Creatures_Type^:S-1;   (The Type of Creature 0-196. Also works with higher creature IDs from mods)
@@ -152,9 +154,9 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!VRs^Arena_21_CB_Sound^:S^ROGUE.wav^;    (Set the name of the sound file that should be played when visiting the object, only works when Arena_21_Custom_Sound is set active)
 
 !!VRi^Arena_21_Extra_Shots^:S4;         [Set number of extra shots]
-!!VRi^Arena_21_Cast_Spell_ID^:S22;      [Set to Inferno cast]
-!!VRi^Arena_21_Cast_Spells^:S1;         [Set amount of cast]
-!!SN:W^Arena_21_Cast_Spell_Damage^/5000; [Set the damage the spell should cause]
+!!VRi^Arena_21_Cast_Spell_ID^:S0;       [No automatic pre-attack spell]
+!!VRi^Arena_21_Cast_Spells^:S0;
+!!VRi^Arena_21_Cast_Spell_Damage^:S0;
 
 !!SN:W^Arena_21_BuffSpell_ID_1^/44;     [set spell 1 ID which should be applied at battle start on stack 21]
 !!SN:W^Arena_21_BuffSpell_Power_1^/10;  [set spell power/effect of that spell, can have different meaning]
@@ -162,6 +164,7 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !!SN:W^Arena_21_BuffSpell_Power_2^/75;  [set spell power/effect of that spell, can have different meaning]
 44  Precision
 28  Air Shield
+!!FU(Arena_Set_Boss_Battle_Def):P21/^ar21.def^; [custom appearance for Robert the Wise]
 
 
 !?FU(OnSetupBattlefield)&i^Arena_Fight^;
@@ -170,17 +173,80 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
   !!BM21:P99;                           [set new position]
 !!en;
 
+
+*Create two clones at the start of every round.
+!?FU(OnCombatRound)&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>21:E;
+!!FU(Arena_21_Create_Clone):P;
+!!FU(Arena_21_Create_Clone):P;
+
+
+*Only teleport when an adjacent enemy would block Robert's ranged attack.
 !?FU(OnBattleStackObtainsTurn)&i^Arena_Fight^;
 !#VA(stackSide:x) (stackInd:x);
 !!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>21:E; [Exit if it is not Arena Fight]
-!!if&x1=1/x2=0;                         [if defender side]
-  !!VRy70:S0R185;                       [generate random battlefield position]
-  !!FU(WOG_GetValidPositionForStack):Py70/35/1/?y71/0; [check if this position is free]
-  !!if&y71>-1;
-    !!BM21:Py71;                        [teleport to new position]
-    !!BM21:P?y10;                       [get position]
-    !!BM21:C65/y10/3/3/0;               [cast clone on that position]
-    !!BM21:U5/-1;                       [reset stacks clone index]
+!!if&x1=1/x2=0;                         [original defender stack]
+  !!BM21:T?y10 N?y11 P?y70;
+  !!FU(Arena_Boss_Has_Adjacent_Enemy)&y10=35/y11>0:Py70/?y72;
+  !!FU(Arena_21_Find_Safe_Ranged_Position)&y72=1:P?y71;
+  !!BM21&y71>=0:Py71;                   [teleport only if a safe free field was found]
+!!en;
+
+
+!?FU(Arena_21_Create_Clone);
+!!BM21:T?y1 N?y2 I?y3 P?y10;
+!!FU|y1<>35/y2<=0/y3<>1:E;
+!!FU(Arena_Boss_CheckIfPossibleToSummon):P1/?y4;
+!!FU&y4=0:E;
+
+*Remember which defender stacks are alive before Clone is cast.
+!!re i/21/41;
+  !!BMi:N?y20;
+  !!SN:W^Arena_21_Clone_Stack_Before_%i^/0;
+  !!SN&y20>0:W^Arena_21_Clone_Stack_Before_%i^/1;
+!!en;
+
+!!SN:W^Arena_21_Clone_Cast_Active^/1;  [temporarily bypass Robert's own Magic Resistance]
+!!BM21:C65/y10/3/3/0;                  [create a real spell clone of Robert]
+!!SN:W^Arena_21_Clone_Cast_Active^/0;
+!!BM21:U5/-1;                           [allow another independent clone]
+
+*Find the newly created clone and move it to a random free field.
+!!VRy30:S-1;
+!!re i/21/41;
+  !!SN:W^Arena_21_Clone_Stack_Before_%i^/?y21;
+  !!BMi:T?y22 N?y23 I?y24;
+  !!if&y21=0/y22=35/y23>0/y24=1;
+    !!VRy30:Si;
+    !!br;
+  !!en;
+!!en;
+!!FU&y30<0:E;
+!!VRy70:S0R185;
+!!FU(WOG_GetValidPositionForStack):Py70/35/1/?y71/0;
+!!BMy30&y71>=0:Py71;
+
+
+*Robert's own Magic Resistance must not block his scripted Clone spell.
+!?MR2&i^Arena_Fight^;
+!!SN:W^Arena_Challenge_Number^/?y1; !!FU&y1<>21:E;
+!!SN:W^Arena_21_Clone_Cast_Active^/?y2; !!FU&y2<>1:E;
+!!MR:N?y3;
+!!MR&y3=21:F0;
+
+
+!?FU(Arena_21_Find_Safe_Ranged_Position);
+*x1 = returned free position without adjacent enemies
+!!VRx1:S-1;
+!!re i/0/60;
+  !!VRy70:S0R185;
+  !!FU(WOG_GetValidPositionForStack):Py70/35/1/?y71/0;
+  !!if&y71>=0;
+    !!FU(Arena_Boss_Has_Adjacent_Enemy):Py71/?y72;
+    !!if&y72=0;
+      !!VRx1:Sy71;
+      !!br;
+    !!en;
   !!en;
 !!en;
 
@@ -205,12 +271,15 @@ At the end of the mod search for Check_Forbidden_Artifacts and remove the code t
 !?FU(Arena_Boss_Increase_Stacks_21);
 !!BM21:N?y1;                            [get stack number]
 !!if&y1>0;                              [if still alive]
-  !!BM21&y1>0:Ad3 Dd3 Ld-5000 V50;      [Increase attack by 5 an restore 1000 Health and play Frenzy animation]
+  !!FU(Arena_Apply_Boss_Effect_Difficulty):P5000/?y90;
+  !!BM21:L?y91;
+  !!VRy91:-y90;
+  !!VRy91&y91<0:S0;
+  !!BM21&y1>0:Ad3 Dd3 Ly91 V50;         [Increase stats and restore difficulty-scaled Health]
   !!VRz-9:S^BLOODLUS^;                  [17  Frenzy]
   !!SN&i^battle_isVisible^:Pz-9;        [play sound]
   !!VRz1:S^The {The Arch Mage} strengthens^; [set battle log]
   !!BU:Mz1;                             [show messag in battle log]
 !!en;
-
 
 

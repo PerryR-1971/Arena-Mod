@@ -1,0 +1,14 @@
+{
+  "arena_mod": {
+    "_notes": {
+      "priority": "Saved values in Runtime/arena config.ini override these defaults.",
+      "reset": "Delete Runtime/arena config.ini to use changed JSON defaults again.",
+      "difficulty": "1 = Peasant, 2 = Warrior, 3 = Berserk, 4 = Chieftain."
+    },
+    "settings": {
+      "Config_Loaded": "TRUE",
+      "Normal_Difficulty": "2",
+      "Boss_Difficulty": "2"
+    }
+  }
+}
