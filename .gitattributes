@@ -1,5 +1,0 @@
-* -text
-
-.gitignore export-ignore
-.gitattributes export-ignore
-.git* export-ignore
