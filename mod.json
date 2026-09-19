@@ -1,14 +1,23 @@
 {
+  "caption": {
+    "en_US": "Arena Mod"
+  },
   "name": {
     "en": "Arena Mod"
   },
   "description": {
+    "full": {
+      "en_US": "readme.txt"
+    },
     "en": "readme.txt"
   },
   "author": "PerryR",
   "homepage": "https://github.com/PerryR-1971/Arena-Mod",
   "support": "https://discord.gg/hCTMfVq6w5",
-  "icon": "arena2.ico",
+  "icon": {
+    "file": "arena2.ico"
+  },
+  "mod_version": "1.1",
   "version": "1.1",
   "category": "gameplay",
   "compatibility": {
